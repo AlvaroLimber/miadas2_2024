@@ -1,0 +1,275 @@
+# Fundamentos de análisis de datos
+
+## Conceptos y terminología
+  
+  - **Datasets:** Colección de datos, comparte el mismo conjunto de *atributos* o *propiedades*
+    + *Universo de estudio*: Colección de unidades de análisis
+    + *Cobertura:* Temporal, espacial, temática
+    + *Unidades estadísticas:* Unidad de análisis, unidad de información
+  - **Análisis de datos:** El análisis de datos es el *proceso* de examinar *datos* para encontrar *hechos*, *relaciones*, *patrones*, *ideas y/o tendencias*. El objetivo general del análisis de datos es *apoyar* una mejor toma de *decisiones.*
+
+> Nota: Minería de datos KDD. Metadata los datos de los datos.
+
+### Actividad 1 (8 min.)
+
+Para las siguientes áreas explore e identifique posibles datasets y algunos objetivos para el análisis de datos:
+
+  + Banca
+  + Salud
+  + Educación
+  + Telecomunicaciones
+  + Agricultura
+  + Comercio exterior
+  
+Explore si existen *datos abiertos* en Bolivia respecto su respuesta.
+
+## Analítica de datos
+
+La analítica de datos es un término más amplio, incluye la gestión del ciclo de vida completo de los datos, que abarca la **recopilación, limpieza, organización, almacenamiento, análisis**. El término incluye el desarrollo de métodos de análisis, técnicas científicas y herramientas. 
+
++ En entornos orientados a los negocios, los resultados de la analítica de datos pueden reducir los costos operativos y facilitar la toma de decisiones estratégicas.
++ En las ciencias, la analítica de datos puede ayudar a identificar la causa de un fenómeno para mejorar la precisión de las predicciones.
+• En entornos basados en servicios como las organizaciones del sector público, puede ayudar a fortalecer el enfoque en la prestación de servicios de alta calidad mediante la reducción de costos.
+
+![](_fig/analitica.PNG)
+
+  + Valor: Compresión en retrospectiva, conocimiento/percepción, previsión 
+  + Complejidad: Baja, media, alta
+
+### Análisis descriptivo
+
+$$f(x)$$
+
+El análisis descriptivo se lleva a cabo para **responder preguntas sobre eventos que ya han ocurrió**. Esta forma de análisis **contextualiza** los datos para generar información. 
+  - *Estadística descriptiva:* Medidas de tendencia central, variabilidad, forma
+  - *Inferencia descriptiva:* Describir a la población de estudio a partir de una muestra probabilística. 
+
+### Análisis de diagnóstico
+
+$$y=f(x_1, x_2, \ldots)$$
+
+El análisis diagnóstico tiene como objetivo determinar la **causa** de un fenómeno que **ocurrió en el pasado**. usando preguntas que se enfocan en la razón detrás del evento. El objetivo de este tipo de análisis es determinar **qué información está relacionada con el fenómeno** para permitir responder preguntas que buscan determinar por qué ha ocurrido algo.
+
+### Análisis predictivo
+
+$$f(x_1,x_2, \ldots)=\hat{y}$$
+El análisis predictivo se lleva a cabo en un intento de determinar el **resultado de un evento que podría ocurrir en el futuro**. Con el análisis predictivo, la información se mejora con significado generar conocimiento que transmita cómo se relaciona esa información. La fuerza y magnitud de las asociaciones forman la base de los modelos que se utilizan para generar futuros predicciones basadas en eventos pasados. Es importante entender que los **modelos utilizados para el análisis predictivo tiene dependencias implícitas** en la condiciones bajo las cuales el pasado ocurrieron los hechos. Si estas condiciones subyacentes cambian, entonces los modelos que hacen predicciones necesitan ser actualizadas.
+
+  + Inferencia predictiva $f(x_1,x_2, \ldots)=\hat{y}$
+  + Inferencia causal
+  
+$$X \rightarrow Y$$
+### Análisis prescriptivo
+
+El análisis prescriptivo se **basa en los resultados del análisis predictivo** al prescribir acciones que se deben tomar. El enfoque no es solo en qué opción prescrita es mejor seguir. En otras palabras, el análisis prescriptivo proporciona resultados sobre los que se puede razonar, porque incorporan elementos de comprensión situacional. Por lo tanto, este tipo de análisis puede utilizarse para obtener una ventaja o mitigar un riesgo.
+
+### Ejercicio
+
+Determinar el tipo de análisis que se requiere en las siguientes solicitudes:
+
+  - El INRA quiere conocer el efecto que tiene la titulación de tierras sobre los ingresos de los productores agropecuarios. **Diagnóstico**
+  - UNICEF quiere conocer el *nivel de pobreza* que existe en los hogares con NNA (*descriptiva*)  y los factores que explican estos resultados (*Diagnóstica*). 
+  - UNFPA quiere saber el efecto que tuvo sus campañas de violencia que realizó en las universidades públicas del país. **Descriptiva, Diagnostica, predictivo** 
+  - KAS quiere conocer los valores democráticos de los jóvenes **descriptiva**
+  - OIM quiere saber que tipos de mensajes de empleo están vinculados a trata y tráfico para monitorear. **Predictiva**
+
+## Indicadores clave de rendimiento (KPI: Key Performance Indicators)
+
+Un KPI es una métrica que se puede usar para medir el éxito dentro de un contexto comercial particular.
+Los KPI están vinculados con **las metas** y objetivos estratégicos generales de una empresa. A menudo se utilizan para identificar problemas de **rendimiento empresarial** y demostrar el cumplimiento normativo. Por lo tanto, los KPI actúan como puntos de referencia **cuantificables** para medir un aspecto específico del rendimiento general de una empresa.
+
+![](_fig/key.PNG)
+
+> Actividad 2. Identifique el tipo de analítica de su respuesta en la actividad 1.
+
+> Actividad 3. Identifique 5 KPI de su respuesta en la actividad 1.
+
+## Tipos de datos (datasets)
+
+  - *Estructurados (tabla):* Tiene la forma de una tabla, donde las filas hacen referencia a observaciones y las columnas a atributos/variables.
+  - *No estructurados (no tabla):* Normalmente se refiere a archivos de audio, imágenes, documentos, etc.
+  - *Semi estructurados (XML, JSON, Sensor):* Son objetos que presentan una estructura que puede ser transformada a algo estructurado.
+
+## Captura y preservación
+
+Se refiere al proceso de *obtener la información* de las distintas *fuentes posibles* y luego pasar a un proceso de *preservación*. 
+
+### Fuentes convencionales
+
+Estas están basadas en la información que se distribuye de forma tradicional mediante bases de datos estructuradas, normalmente estas las distribuyen instituciones con amplios conocimientos en la gestión de bases de datos, para el caso de Bolivia se puede citar algunas:
+
+  * Instituto Nacional de Estadística
+  * SNIS: Salud
+  * SIE: Educación
+  * UDAPE
+  * Geobolivia: Mapas
+  * Ministerios ...
+  * Bancos
+  * Telecomunicaciones
+  
+Tipo de recolección de datos  
+  
+  + *Censos:* Recolección completa del universo, no constante pero si periódica. 
+  + *Encuestas:* Recolección parcial (muestra) del universo. 
+  + *Registros administrativos:* Recolección con fines administrativos, de forma constante. "Internet"
+
+### Datos web y APIs
+
+Se refiere a la captura y uso de la información que se genera en espacios digitales, web, redes sociales, etc.
+
+Las APIs son puertas de entrada creadas por los administradores de una página web, que permiten el acceso a información seleccionada en formatos amigables. 
+
+### Record Linkage (enlaces/llaves)
+
+Se refiere al proceso de concatenar o unir observaciones dispuestas en múltiples bases de datos.
+
+  * Puede ser usado para compensar la falta de información
+  * Se usa para crear estudios longitudinales
+  * Se pueden armar **seudo-paneles**
+
+Esto permite mejorar la cobertura (append), ampliar las temáticas de estudio (merge). 
+
+Ejemplos: 
+
+  + Pseudo-paneles: Cortes(años de nacimiento)
+  + Unidades educativas: RUE
+  + Municipios: Código de 6 dígitos,       
+    - 020101 La Paz
+    - 020105 El Alto
+  + Clasificadores: Actividades económicas, productos.
+
+## Calidad de dato
+
+La mayoría de los datos en el mundo real son *ruidosos*, *inconsistentes* y adolecen de *valores perdidos*, independientemente de su origen. Incluso si la recopilación de datos es barata, los costos de crear datos de alta calidad a partir de la fuente (limpieza, conservación, estandarización e integración) son considerables. La calidad de los datos se puede caracterizar de múltiples maneras:
+
+* **Precisión:** ¿qué tan precisos son los valores de los atributos en los datos?
+* **Integridad:** ¿están completos los datos?
+* **Consistencia:** ¿Cuán consistentes son los valores *en* y entre las bases de datos?
+* **Puntualidad:** ¿qué tan oportunos son los datos?
+* **Accesibilidad:** ¿están disponibles todas las variables para el análisis?
+
+Los cientistas de datos tienen décadas de experiencia en la *transformación de datos desordenados, ruidosos y no estructurados* en un conjunto de *datos bien definido*, claramente estructurado y probado en calidad. 
+
+> DATA > RAM
+> DATA > DISCO
+
+El pre procesamiento es un *proceso complejo* y que lleva mucho tiempo porque es *práctico*: requiere juicio y no puede *automatizarse de manera efectiva*. Un *flujo de trabajo* típico comprende múltiples pasos desde la definición de datos hasta el análisis y termina con el filtrado. 
+
+> Es difícil exagerar el valor del pre-procesamiento para cualquier análisis de datos, pero esto es particularmente cierto en big data. Los datos deben analizarse, estandarizarse, no duplicarse y normalizarse.
+
+* **Análisis (parsing):** Exploración de datos
+* **Estandarización (Standardization):** Identificar variables que requieren *transformación* y *ajustes*.
+  - Adecuación de formatos
+  - Limpieza de texto
+  - Creación de nuevas variables (ingeniería de características)
+* **Duplicación:** Consiste en eliminar registros redundantes
+* **Normalización (Normalization):** Es el proceso de garantizar que los campos que se comparan entre archivos sean lo más similares posible en el sentido de que podrían haber sido generados por el mismo proceso. Como mínimo, se deben aplicar las mismas reglas de estandarización a ambos *archivos*.
+
+## Análisis y modelado
+
+### Machine learning
+
+Al pensar en machine learning debemos asociarlo directamente con *procesos computacionales*, muchos otros conceptos giran al rededor de esta idea como la *inteligencia artificial*. Proceso de machine learning hoy:
+
+  * Permiten manejar autos de forma autónoma
+  * Puede recomendar libros, amistades, música, etc.
+  * Identificar drogas, proteínas y ciertos génes
+  * Se usa para detectar ciertos tipos de cáncer y otras enfermedades médicas.
+  * Ayudan a conocer que estudiantes necesitan un apoyo adicional
+  * Ayudan a persuadir por que candidato votar en las elecciones.
+    + Cambridge Analytica.
+
+#### El proceso del machine learning
+  
+Se parte de el planteamiento del problema, identificación de la meta, pregunta de investigación, etc.   
+  
+  * Entender el *problema* y la *meta*
+  * Formular esto como un *problema de machine learning*
+  * Explorar y preparar los datos
+  * Feature engineeing (Ingeniería del ML)
+  * Selección del método
+  * Evaluación
+  * Deployment
+
+#### Formulación del problema ML
+
+En ML existen 2 grandes categorías
+
+  1. *Aprendizaje supervisado:* Existe una $Y$ que queremos predecir o clasificar a partir de los datos. El fin es el ajuste y la generalización
+    * Clasificación ($Y$ cualitativa)
+    * Predicción ($\hat{Y}$)
+    * Regresión ($Y$ cuantitativa) ($\beta$)
+    
+  2. *Aprendizaje no supervisado:* No existe una variable objetivo, se quiere conocer, entender las asociaciones y patrones naturales en los datos. 
+    * Asociaciones 
+    * Clustering/Agrupamiento (*Unidad de análisis*)
+    * Reducción de dimensionalidad; PCA, MCA (*Atributos*)
+    * Análisis factorial, modelos estructurales
+    
+![](_fig/bd6.PNG)
+
+### Análisis de texto: Entendiendo lo que la gente escribe
+
+  * Clasificación de documentos
+  * Análisis de sentimientos
+  * Etiquetado de discursos
+  
+El modelado de texto se clasifica en 2:
+
+  + Bolsa de palabras (bag words): No interesa la estructura del texto
+  + Análisis sintáctico: Le interesa estudiar la estructura de la oración (ChatGPT)
+  
+### Networks (Análisis de redes)
+
+![](_fig/bd7.PNG)
+![](_fig/bd8.PNG)
+
+> Nota: Análisis espacial, serie temporales 
+
+## Información y visualización
+
+> Los usuarios pueden escanear, reconocer, comprender y recordar representaciones visualmente estructuradas más rápidamente de lo que pueden procesar representaciones no estructuradas
+
+> La ciencia de la visualización se basa en múltiples campos, como la psicología perceptiva, las estadísticas y el diseño gráfico para presentar información
+
+> La efectividad de una visualización depende tanto de las necesidades de análisis como de los objetivos de diseño.
+
+> El diseño, el desarrollo y la evaluación de una visualización se guían por la comprensión de los antecedentes y las metas del público objetivo.
+
+El desarrollo de una visualización efectiva es un proceso iterativo que generalmente incluye los siguientes pasos:
+
+  * Especificar las necesidades del usuario, tareas, requisitos de accesibilidad y criterios para el éxito.
+  * Preparar datos (limpiar, transformar).
+  * Diseñar representaciones visuales.
+  * Interacción de diseño.
+  * Planifique el intercambio de ideas, procedencia.
+  * Prototipo / evaluación, incluidas las pruebas de usabilidad.
+  * Implementar (supervisar el uso, proporcionar soporte al usuario, gestionar el proceso de revisión).
+
+![](https://www.babynamewizard.com/voyager)
+
+#### Dashboards
+
+![](_fig/bd9.PNG)
+![](_fig/bd10.PNG)
+
+#### Elementos
+
+![](_fig/bd11.PNG)
+
+#### Datos espaciales
+
+![](_fig/bd12.PNG)
+
+  * Datos temporales
+  * Datos jerárquicos
+  * Datos de redes
+  * Datos de texto
+
+## Ejercicios
+
+1. Explorar los métodos experimentales y cuasi-experimentales que existen 
+2. Buscar información respecto a: los matriculados en educación regular y universidad por año y departamento en Bolivia
+3. Empleando la fuente anterior, generar en R el código que cargue el archivo encontrado 
+4. Buscar dos papers (1) donde se uso machine learning y (2) análisis de texto y comentar.
+5. Buscar ejemplos (al menos uno) de bases de datos, páginas web u otros asociados a datos que no respeten los principios de *privacidad y confidencialidad*.
