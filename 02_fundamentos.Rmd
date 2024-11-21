@@ -5,12 +5,10 @@
   - **Datasets:** Colección de datos, comparte el mismo conjunto de *atributos* o *propiedades*
     + *Universo de estudio*: Colección de unidades de análisis
     + *Cobertura:* Temporal, espacial, temática
-    + *Unidades estadísticas:* Unidad de análisis, unidad de información
+    + *Unidades estadísticas:* Unidad de análisis, unidad de información, unidades elementales y agregadas
   - **Análisis de datos:** El análisis de datos es el *proceso* de examinar *datos* para encontrar *hechos*, *relaciones*, *patrones*, *ideas y/o tendencias*. El objetivo general del análisis de datos es *apoyar* una mejor toma de *decisiones.*
 
-> Nota: Minería de datos KDD. Metadata los datos de los datos.
-
-### Actividad 1 (8 min.)
+### Actividad 1 (10 min.) Termina a las 20:28. 
 
 Para las siguientes áreas explore e identifique posibles datasets y algunos objetivos para el análisis de datos:
 
@@ -20,8 +18,31 @@ Para las siguientes áreas explore e identifique posibles datasets y algunos obj
   + Telecomunicaciones
   + Agricultura
   + Comercio exterior
+  + Otra
   
 Explore si existen *datos abiertos* en Bolivia respecto su respuesta.
+
+> Ejemplo
+
+- Área: Comercio exterior
+- Dataset: Clientes, importación y exportación
+- Objetivo de análisis de datos: Relación entre importación y exportación *Diagnóstico*
+- Ejemplo de dato abierto: INE
+
+- Área: Banca
+- Dataset: Transacciones, historial, fraude (casos verificados)
+- Objetivo de análisis de datos: Identificar el comportamiento del mercado *Descriptiva, diagnóstica*, predicciones de riesgo *predictiva* y ajuste de interés
+- Ejemplo de dato abierto: Hackaton, DATATON
+
+- Área: Agricultura
+- Dataset: Sensores, imágenes satelitales, Cosecha 
+- Objetivo de análisis de datos: Identificación de plagas y enfermedades *Descriptiva, diagnóstica*, relación de la sequía y la producción *diagnóstica*
+- Ejemplo de dato abierto: Min. Desarrollo, Geo Bolivia
+
+- Área: Educación
+- Dataset: Estudiantes, docentes, colegios
+- Objetivo de análisis de datos: Matrícula *descriptiva*, relación de docentes por estudiante *diagnóstica*, *predecir los estudiantes de la siguiente gestión*, *Shocks*   
+- Ejemplo de dato abierto: Min. Educación
 
 ## Analítica de datos
 
@@ -29,14 +50,14 @@ La analítica de datos es un término más amplio, incluye la gestión del ciclo
 
 + En entornos orientados a los negocios, los resultados de la analítica de datos pueden reducir los costos operativos y facilitar la toma de decisiones estratégicas.
 + En las ciencias, la analítica de datos puede ayudar a identificar la causa de un fenómeno para mejorar la precisión de las predicciones.
-• En entornos basados en servicios como las organizaciones del sector público, puede ayudar a fortalecer el enfoque en la prestación de servicios de alta calidad mediante la reducción de costos.
++ En entornos basados en servicios como las organizaciones del sector público, puede ayudar a fortalecer el enfoque en la prestación de servicios de alta calidad mediante la reducción de costos.
 
 ![](_fig/analitica.PNG)
 
   + Valor: Compresión en retrospectiva, conocimiento/percepción, previsión 
   + Complejidad: Baja, media, alta
 
-### Análisis descriptivo
+### Analítica descriptiva
 
 $$f(x)$$
 
@@ -44,13 +65,17 @@ El análisis descriptivo se lleva a cabo para **responder preguntas sobre evento
   - *Estadística descriptiva:* Medidas de tendencia central, variabilidad, forma
   - *Inferencia descriptiva:* Describir a la población de estudio a partir de una muestra probabilística. 
 
-### Análisis de diagnóstico
+### Analítica de diagnóstico
 
 $$y=f(x_1, x_2, \ldots)$$
 
-El análisis diagnóstico tiene como objetivo determinar la **causa** de un fenómeno que **ocurrió en el pasado**. usando preguntas que se enfocan en la razón detrás del evento. El objetivo de este tipo de análisis es determinar **qué información está relacionada con el fenómeno** para permitir responder preguntas que buscan determinar por qué ha ocurrido algo.
+El análisis diagnóstico tiene como objetivo determinar la **causa** de un fenómeno que **ocurrió en el pasado**. usando preguntas que se enfocan en la razón detrás del evento. El objetivo de este tipo de análisis es determinar **qué información está relacionada con el fenómeno** para permitir responder preguntas que buscan determinar *por qué ha ocurrido algo*.
 
-### Análisis predictivo
+  - Estadística multivariante, minería de datos "relaciones"
+  - Causalidad: Diseños experimentales (tratamiento/control). "Diseños cuasi-experimentales"
+  - Modelos lineales, econometría
+
+### Analítica predictiva
 
 $$f(x_1,x_2, \ldots)=\hat{y}$$
 El análisis predictivo se lleva a cabo en un intento de determinar el **resultado de un evento que podría ocurrir en el futuro**. Con el análisis predictivo, la información se mejora con significado generar conocimiento que transmita cómo se relaciona esa información. La fuerza y magnitud de las asociaciones forman la base de los modelos que se utilizan para generar futuros predicciones basadas en eventos pasados. Es importante entender que los **modelos utilizados para el análisis predictivo tiene dependencias implícitas** en la condiciones bajo las cuales el pasado ocurrieron los hechos. Si estas condiciones subyacentes cambian, entonces los modelos que hacen predicciones necesitan ser actualizadas.
@@ -59,19 +84,24 @@ El análisis predictivo se lleva a cabo en un intento de determinar el **resulta
   + Inferencia causal
   
 $$X \rightarrow Y$$
-### Análisis prescriptivo
+  - Machine learning: Clasificación, redes neuronales
 
-El análisis prescriptivo se **basa en los resultados del análisis predictivo** al prescribir acciones que se deben tomar. El enfoque no es solo en qué opción prescrita es mejor seguir. En otras palabras, el análisis prescriptivo proporciona resultados sobre los que se puede razonar, porque incorporan elementos de comprensión situacional. Por lo tanto, este tipo de análisis puede utilizarse para obtener una ventaja o mitigar un riesgo.
+
+### Analítica prescriptiva
+
+El análisis prescriptivo se **basa en los resultados del análisis predictivo** al prescribir acciones que se deben tomar. El enfoque no es solo en qué opción prescrita es mejor seguir. En otras palabras, el análisis prescriptivo proporciona resultados sobre los que se puede razonar, porque incorporan elementos de comprensión situacional. Por lo tanto, este tipo de análisis puede utilizarse para obtener una ventaja o *mitigar un riesgo*.
+
+  - Deep learning, etc. DATA>RAM
 
 ### Ejercicio
 
 Determinar el tipo de análisis que se requiere en las siguientes solicitudes:
 
-  - El INRA quiere conocer el efecto que tiene la titulación de tierras sobre los ingresos de los productores agropecuarios. **Diagnóstico**
-  - UNICEF quiere conocer el *nivel de pobreza* que existe en los hogares con NNA (*descriptiva*)  y los factores que explican estos resultados (*Diagnóstica*). 
-  - UNFPA quiere saber el efecto que tuvo sus campañas de violencia que realizó en las universidades públicas del país. **Descriptiva, Diagnostica, predictivo** 
-  - KAS quiere conocer los valores democráticos de los jóvenes **descriptiva**
-  - OIM quiere saber que tipos de mensajes de empleo están vinculados a trata y tráfico para monitorear. **Predictiva**
+  - El INRA quiere conocer el efecto que tiene la titulación de tierras sobre los ingresos de los productores agropecuarios. ****
+  - UNICEF quiere conocer el *nivel de pobreza* que existe en los hogares con NNA  y los factores que explican estos resultados. 
+  - UNFPA quiere saber el efecto que tuvo sus campañas de violencia que realizó en las universidades públicas del país. 
+  - KAS quiere conocer los valores democráticos de los jóvenes
+  - OIM quiere saber que tipos de mensajes de empleo están vinculados a trata y tráfico para monitorear. 
 
 ## Indicadores clave de rendimiento (KPI: Key Performance Indicators)
 
@@ -79,10 +109,6 @@ Un KPI es una métrica que se puede usar para medir el éxito dentro de un conte
 Los KPI están vinculados con **las metas** y objetivos estratégicos generales de una empresa. A menudo se utilizan para identificar problemas de **rendimiento empresarial** y demostrar el cumplimiento normativo. Por lo tanto, los KPI actúan como puntos de referencia **cuantificables** para medir un aspecto específico del rendimiento general de una empresa.
 
 ![](_fig/key.PNG)
-
-> Actividad 2. Identifique el tipo de analítica de su respuesta en la actividad 1.
-
-> Actividad 3. Identifique 5 KPI de su respuesta en la actividad 1.
 
 ## Tipos de datos (datasets)
 
@@ -149,9 +175,6 @@ La mayoría de los datos en el mundo real son *ruidosos*, *inconsistentes* y ado
 * **Accesibilidad:** ¿están disponibles todas las variables para el análisis?
 
 Los cientistas de datos tienen décadas de experiencia en la *transformación de datos desordenados, ruidosos y no estructurados* en un conjunto de *datos bien definido*, claramente estructurado y probado en calidad. 
-
-> DATA > RAM
-> DATA > DISCO
 
 El pre procesamiento es un *proceso complejo* y que lleva mucho tiempo porque es *práctico*: requiere juicio y no puede *automatizarse de manera efectiva*. Un *flujo de trabajo* típico comprende múltiples pasos desde la definición de datos hasta el análisis y termina con el filtrado. 
 
