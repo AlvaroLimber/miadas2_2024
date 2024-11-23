@@ -97,11 +97,11 @@ El análisis prescriptivo se **basa en los resultados del análisis predictivo**
 
 Determinar el tipo de análisis que se requiere en las siguientes solicitudes:
 
-  - El INRA quiere conocer el efecto que tiene la titulación de tierras sobre los ingresos de los productores agropecuarios. ****
-  - UNICEF quiere conocer el *nivel de pobreza* que existe en los hogares con NNA  y los factores que explican estos resultados. 
-  - UNFPA quiere saber el efecto que tuvo sus campañas de violencia que realizó en las universidades públicas del país. 
-  - KAS quiere conocer los valores democráticos de los jóvenes
-  - OIM quiere saber que tipos de mensajes de empleo están vinculados a trata y tráfico para monitorear. 
+  - El INRA quiere conocer el efecto que tiene la titulación de tierras sobre los ingresos de los productores agropecuarios. **Diagnóstica**
+  - UNICEF quiere conocer el *nivel de pobreza* que existe en los hogares con NNA **Descriptiva** y los factores que explican estos resultados **Diagnóstica**. 
+  - UNFPA quiere saber el efecto que tuvo sus campañas contra la violencia que realizó en las universidades públicas del país. **Depende del dataset (recolección de datos)**. 
+  - KAS quiere conocer los valores democráticos de los jóvenes **Descriptiva**
+  - OIM quiere saber que tipos de mensajes de empleo están vinculados a trata y tráfico para monitorear. **Diagnóstica -> Predictivo**
 
 ## Indicadores clave de rendimiento (KPI: Key Performance Indicators)
 
@@ -124,8 +124,9 @@ Se refiere al proceso de *obtener la información* de las distintas *fuentes pos
 
 Estas están basadas en la información que se distribuye de forma tradicional mediante bases de datos estructuradas, normalmente estas las distribuyen instituciones con amplios conocimientos en la gestión de bases de datos, para el caso de Bolivia se puede citar algunas:
 
+  * Recolección primaria
   * Instituto Nacional de Estadística
-  * SNIS: Salud
+  * SNIS: Salud: https://snis.minsalud.gob.bo/
   * SIE: Educación
   * UDAPE
   * Geobolivia: Mapas
@@ -133,11 +134,17 @@ Estas están basadas en la información que se distribuye de forma tradicional m
   * Bancos
   * Telecomunicaciones
   
-Tipo de recolección de datos  
+Tipo de *recolección de datos*
   
-  + *Censos:* Recolección completa del universo, no constante pero si periódica. 
-  + *Encuestas:* Recolección parcial (muestra) del universo. 
+  + *Censos:* Recolección completa del universo, no constante pero si periódica. Tiene un objetivo estadístico. 
+    - Censos de Población y Vivienda: 2024, 2012, 2001, ... 
+    - Censos Agropecuarias: 2013, 1984
+    - Censos Económicos 
+  + *Encuestas:* Recolección parcial (muestra) del universo. Si esta muestra se recolecta de forma aleatoria es posible la *inferencia*. Tiene un objetivo estadístico. 
+    - Un sondeo es una muestra no representativa (estudio observacional)
   + *Registros administrativos:* Recolección con fines administrativos, de forma constante. "Internet"
+    - Instituciones publicas y privadas
+    - Registros administrativos digitales
 
 ### Datos web y APIs
 
@@ -147,7 +154,7 @@ Las APIs son puertas de entrada creadas por los administradores de una página w
 
 ### Record Linkage (enlaces/llaves)
 
-Se refiere al proceso de concatenar o unir observaciones dispuestas en múltiples bases de datos.
+Se refiere al proceso de concatenar o unir observaciones dispuestas en múltiples bases de datos (dataset).
 
   * Puede ser usado para compensar la falta de información
   * Se usa para crear estudios longitudinales
@@ -157,6 +164,7 @@ Esto permite mejorar la cobertura (append), ampliar las temáticas de estudio (m
 
 Ejemplos: 
 
+  + Si se tienen dos dataframes de personas, estas se podrían unir con base al número de carnet de las personas
   + Pseudo-paneles: Cortes(años de nacimiento)
   + Unidades educativas: RUE
   + Municipios: Código de 6 dígitos,       
