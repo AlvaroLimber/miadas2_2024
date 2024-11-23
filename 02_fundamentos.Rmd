@@ -177,8 +177,14 @@ Ejemplos:
 La mayoría de los datos en el mundo real son *ruidosos*, *inconsistentes* y adolecen de *valores perdidos*, independientemente de su origen. Incluso si la recopilación de datos es barata, los costos de crear datos de alta calidad a partir de la fuente (limpieza, conservación, estandarización e integración) son considerables. La calidad de los datos se puede caracterizar de múltiples maneras:
 
 * **Precisión:** ¿qué tan precisos son los valores de los atributos en los datos?
+  - Encuestas: error muestral $\theta$ $\hat{\theta}$ $V(\hat\theta)$
+  - Error total de respuesta
 * **Integridad:** ¿están completos los datos?
+  - Al interior de un atributo. Valores perdidos, univariantes, multivariantes, aleatoria, sistemática
+  - Dentro del proceso de recolección de datos. Observaciones/casos perdidos
 * **Consistencia:** ¿Cuán consistentes son los valores *en* y entre las bases de datos?
+  - Univariante: Valores atípicos, valores no esperados
+  - Multivariante
 * **Puntualidad:** ¿qué tan oportunos son los datos?
 * **Accesibilidad:** ¿están disponibles todas las variables para el análisis?
 
@@ -192,7 +198,7 @@ El pre procesamiento es un *proceso complejo* y que lleva mucho tiempo porque es
 * **Estandarización (Standardization):** Identificar variables que requieren *transformación* y *ajustes*.
   - Adecuación de formatos
   - Limpieza de texto
-  - Creación de nuevas variables (ingeniería de características)
+  - Creación de nuevas variables (*ingeniería de características*)
 * **Duplicación:** Consiste en eliminar registros redundantes
 * **Normalización (Normalization):** Es el proceso de garantizar que los campos que se comparan entre archivos sean lo más similares posible en el sentido de que podrían haber sido generados por el mismo proceso. Como mínimo, se deben aplicar las mismas reglas de estandarización a ambos *archivos*.
 
@@ -229,13 +235,13 @@ En ML existen 2 grandes categorías
   1. *Aprendizaje supervisado:* Existe una $Y$ que queremos predecir o clasificar a partir de los datos. El fin es el ajuste y la generalización
     * Clasificación ($Y$ cualitativa)
     * Predicción ($\hat{Y}$)
-    * Regresión ($Y$ cuantitativa) ($\beta$)
+    * Regresión ($Y$ cuantitativa) ($\beta$) $y=\beta_0+\beta_1x+\epsilon$
     
   2. *Aprendizaje no supervisado:* No existe una variable objetivo, se quiere conocer, entender las asociaciones y patrones naturales en los datos. 
-    * Asociaciones 
+    * Asociaciones: Transacciones 
     * Clustering/Agrupamiento (*Unidad de análisis*)
     * Reducción de dimensionalidad; PCA, MCA (*Atributos*)
-    * Análisis factorial, modelos estructurales
+    * Análisis factorial, modelos estructurales $\Lambda -> X_1, X_2$
     
 ![](_fig/bd6.PNG)
 
@@ -255,7 +261,9 @@ El modelado de texto se clasifica en 2:
 ![](_fig/bd7.PNG)
 ![](_fig/bd8.PNG)
 
-> Nota: Análisis espacial, serie temporales 
+> Nota: Análisis espacial
+
+> Pendiente
 
 ## Información y visualización
 
