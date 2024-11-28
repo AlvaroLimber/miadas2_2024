@@ -8,9 +8,9 @@ editor_options:
 
 ## Fuentes de información convencionales
 
-  - *Censos*: La principal amenaza corresponde a la sobre y sub cobertura. 
-  - *Encuestas:* Hay diferencia entre encuestas "sondeos" que se realizan sin un enfoque estadístico y encuestas que siguen un esquema de *muestreo aleatorio*. Ejemplo; dataset la encuesta de hogares 2022 del INE
-  - *Registros administrativos:* Normalmente los registros administrativos tienen problemas de contenido. Ejemplo; dataset de importaciones y exportaciones del INE del 2023/2024. 
+  - *Censos*: La principal amenaza corresponde a la sobre, sub cobertura y duplicidad. Error Temático. 
+  - *Encuestas:* Hay diferencia entre encuestas "sondeos" que se realizan sin un enfoque estadístico y encuestas que siguen un esquema de *muestreo aleatorio*. Ejemplo; dataset la *encuesta de hogares* 2022 del INE
+  - *Registros administrativos:* Normalmente los registros administrativos tienen problemas de contenido/temático. Ejemplo; dataset de importaciones y exportaciones del INE del 2023/2024. 
   
 ### Almacenamiento
 
@@ -24,10 +24,48 @@ Para el almacenamiento se recomienda establecer un protocolo de "guardado":
 
 En el caso del R, se recomienda tener un proyecto y dentro de este proyecto tener una carpeta para almacenar los datos en un formato RData.
 
-```{r}
-#importar archivos en excel
+> Actividad: Descargar (10 min)
+  - Censo 1976
+  - Las importaciones y exportaciones de 2023 y 2024
+  - Encuesta a hogares 2022
 
-#encuestas
+```{r}
+rm(list = ls())
+#install.packages("readxl")#importar excel
+#install.packages("haven")#importar spss stata
+#install.packages("labelled")# permite el manejo de etiquetas 
+library(readxl)
+library(haven)
+library(labelled)
+library(foreign)
+# library(help=foreign)
+# readxl::read_xlsx()
+##########
+#registro
+##########
+i23<-read_xlsx("/home/alvaro/Descargas/IMPORTACIONES_2023p.xlsx")
+i24<-read_xlsx("/home/alvaro/Descargas/IMPORTACIONES_ENE_SEP_2024p.xlsx")
+e23<-read_xlsx("/home/alvaro/Descargas/EXPORTACIONES 2023p.xlsx")
+#e23<-read_xlsx("~/Descargas/EXPORTACIONES 2023p.xlsx")
+e24<-read_xlsx("/home/alvaro/Descargas/EXPORTACIONES ENE A SEP 2024p.xlsx")
+dic_e<-read_xlsx("/home/alvaro/Descargas/DICCIONARIO BD-EXPORTACION.xlsx" , range="A9:F43")
+dic_i<-read_excel("/home/alvaro/Descargas/DICCIONARIO BD-IMPORTACION.xlsx", range = "A10:F39")
+#dic_e<-read_xlsx("DICCIONARIO BD-EXPORTACION.xlsx" , range="A9:F43")
+getwd()
+#setwd("directorio")
+save(e23, i23, e24, i24, dic_e, dic_i, file = "_data/ie2324.RData")
+load("_data/ie2324.RData")
+writexl::write_xlsx(e23, "_data/e23.xlsx")
+write.csv(e23, "_data/e23.csv")
+###########
+#encuesta
+##########
+eh22p<-read_sav("~/Descargas/BD_EH2022(1)/BD/EH2022_Persona.sav")
+eh22v<-read_sav("~/Descargas/BD_EH2022(1)/BD/EH2022_Vivienda.sav")
+save(eh22p, eh22v, file = "_data/eh22.RData")
+load("_data/eh22.RData")
+#censo
+#TAREA
 ```
 
 > Para exportar datos en R, se utiliza los comandos que empiezan con write.
