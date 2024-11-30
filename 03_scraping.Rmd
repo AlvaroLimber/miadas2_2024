@@ -192,10 +192,65 @@ Como se vio antes, una herramienta para facilitar la identificación del CSS o "
 rm(list = ls())
 library(rvest)
 library(dplyr)# gramática del manejo de datos (Tipo SQL)
-#Ejemplo dplyr
+library(xml2)
+#Ejemploxml2#Ejemplo dplyr
+names(iris) #R
+#operador pipe %>%  ctr+shit+M %>% %>%
+iris %>% names()
 # Portal 1
+www<-"https://bancounion.com.bo/Personas/DepositosPlazoFijo"
+bunion<-read_html(www)
+html_nodes(html_nodes(bunion, ".form-text"), ".text-justify")
+e1<-bunion %>% html_nodes(".form-text") %>% html_nodes(".text-justify") %>% html_text2()
 # Portal 2
-# Portal 3
+www<-"https://www.urgente.bo/"
+urgente <- read_html(www)
+urgente %>% html_nodes("a") %>% html_text2()
+urgente %>% html_nodes("h2") %>% html_text2()
+titulares<-urgente %>% html_nodes(".normal-image-content") %>% html_nodes("h2") %>% html_nodes("a") %>% html_text2()
+fecha<-urgente %>% html_nodes(".normal-image-content") %>%html_nodes("p") %>% html_text2()
+bd1<-data.frame(titulares, fecha)
+# Portal 3 (ejercicio)
+www<-"https://www.ultracasas.com/buscar/casa-en-venta--en--la-paz---la-paz?page=1"
+ultra<-read_html(www)
+precio<-ultra %>% html_nodes(".pos-relative") %>% html_nodes("h4") %>% html_text2()
+aux<-ultra %>% html_nodes(".pos-relative") %>% html_nodes(".icon-default-color") %>% html_text2()
+cuartos<-aux[seq(1,36,3)]
+banios<-aux[seq(2,36,3)]
+mt2<-aux[seq(3,36,3)]
+zonas <- ultra %>% 
+  html_nodes(".pos-relative") %>% 
+  html_nodes("h2")%>% 
+  html_text2()
+bd3<-data.frame(precio, cuartos, banios, mt2, zonas )
+
+www<-"https://www.ultracasas.com/buscar/casa-en-venta--en--la-paz---la-paz?page="
+bdultra<-NULL
+for(i in 1:100){
+  print(i)
+  ultra<-read_html(paste0(www, i) )
+  precio<-ultra %>% html_nodes(".pos-relative") %>% html_nodes("h4") %>% html_text2()
+  aux<-ultra %>% html_nodes(".pos-relative") %>% html_nodes(".icon-default-color") %>% html_text2()
+  cuartos<-aux[seq(1, length(aux), 3)]
+  banios<-aux[seq(2, length(aux), 3)]
+  mt2<-aux[seq(3, length(aux), 3)]
+  zonas <- ultra %>% 
+    html_nodes(".pos-relative") %>% 
+    html_nodes("h2")%>% 
+    html_text2()
+  bdaux<-data.frame(precio, cuartos, banios, mt2, zonas )
+  bdultra <- bdultra %>% bind_rows(bdaux)
+}  
+#portal 4
+www<-"https://coinmarketcap.com/"
+coins<-read_html(www)
+t1<-coins %>% html_table()
+t1<-t1[[1]]
+#portal 5
+www<-"https://www.worldometers.info/world-population/bolivia-population/"
+bolivia<-read_html(www)
+tb<-bolivia %>% html_table()
+t5<-tb[[4]]
 ```
 
 ### Ejemplo: enlaces descargables
@@ -287,7 +342,7 @@ En R se puede acceder mediante la librería wbstats.
 ```{r,eval=F}
 rm(list=ls())
 #install.packages("wbstats")
-library("wbstats")
+library(wbstats)
 #library(help="wbstats")
 #paso 1, instalar el rtools: https://cran.r-project.org/bin/windows/Rtools/
 #paso 2, instalar devtools
@@ -298,18 +353,23 @@ library("wbstats")
 #install_github("nset-ornl/wbstats")
 #acceso a todos los indicadores disponibles
 wbindex<-wb_indicators("es")
-bd1<-wb_data("1.0.HCount.1.90usd")
+bd0<-wb_data("2.0.cov.Cel")
+bd1<-wb_data("1.0.HCount.1.90usd", country = "BO", start_date = 1900, end_date = 2024)
 #búsqueda de indicador
 index_edu<-wb_search(pattern = "education")
 index_sal<-wb_search(pattern = "health")
 index_pib<-wb_search(pattern = "gdp")
+index_price<-wb_search(pattern = "price")
+bd2<-wb_data("4.1_TOTAL.EDU.SPENDING")
 # ver los países y sus códigos 
 wbpais<-wb_countries()             
 #Comando para extraer los indicadores
 t1<-wb_data(country = c("BOL","PER"), indicator = "NY.GDP.MKTP.CD", start_date = 1900, end_date = 2024)
 
-t1[t1$iso2c=="BO", ]
+library(ggplot2)#data, estética (atributos), geometría
+ggplot(t1, aes(date, NY.GDP.MKTP.CD, col=country))+geom_line()+geom_point()+geom_smooth()
 
+t1[t1$iso2c=="BO", ]
 plot(t1$date[t1$iso2c=="BO"], t1$NY.GDP.MKTP.CD[t1$iso2c=="BO"], col="red", type = "b")
 
 plot(t1$date[t1$iso2c=="PE"], t1$NY.GDP.MKTP.CD[t1$iso2c=="PE"], col="blue", type = "b")
@@ -317,7 +377,9 @@ plot(t1$date[t1$iso2c=="PE"], t1$NY.GDP.MKTP.CD[t1$iso2c=="PE"], col="blue", typ
 plot(t1$date[t1$iso2c=="BO"], t1$NY.GDP.MKTP.CD[t1$iso2c=="BO"], col="red", type = "b", ylim = c(0, 300000000000))
 points(t1$date[t1$iso2c=="PE"], t1$NY.GDP.MKTP.CD[t1$iso2c=="PE"], col="blue", type = "b")
 
-t2<-wb_data(country = c("BOL","PER"),indicator = "SE.SEC.TCHR", start_date = 2000, end_date = 2020)
+pobreza<-wb_data("1.0.HCount.1.90usd", country = "BOL")
+pib<-wb_data("NY.GDP.MKTP.CD", country = "BOL")
+bdf<-pobreza[, -9] %>% inner_join(pib[, -9])
 ```
 
 ## Ejercicios Propuestos
@@ -325,6 +387,6 @@ t2<-wb_data(country = c("BOL","PER"),indicator = "SE.SEC.TCHR", start_date = 200
 1. Extraer la fecha, y el precio de compra y venta del dolar de la página https://www.bcb.gob.bo
 2. Usando la página https://www.trabajopolis.bo/ seleccionar un departamento y armar una base de dato de ofertas laborales
 3. Armar una base de datos en base a la página https://www.infocasas.com.bo
-4. Explorar librerias API con acceso a Youtube y encontrar los 10 videos con más visualizaciones que incluyan a Bolivia en su titulo.
-5. Explorar la libreria gtrendsR y explorar en que meses en Bolivia es mas frecuente la búsqueda de ...
+4. Explorar librerías API con acceso a Youtube y encontrar los 10 videos con más visualizaciones que incluyan a Bolivia en su titulo.
+5. Explorar la librería gtrendsR y explorar en que meses en Bolivia es mas frecuente la búsqueda de ...
 6. Usar la información de worldometers y generar un gráfico de contagios por millón de los distintos países.
