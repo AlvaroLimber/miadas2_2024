@@ -89,8 +89,28 @@ Siguiendo a [@Iacus2015] que establece cinco pasos al momento de decidir recopil
 5. ¡Toma una decisión! Elija la fuente de datos que le parezca más adecuada, *documente* los motivos de la decisión y comience con los preparativos para la *recopilación*. Si es factible, recopile datos de *varias fuentes* para validar las fuentes de datos. Muchos problemas y beneficios de varias *estrategias de recopilación* de datos salen a la luz solo después de la recopilación real.
 
 > Actividad (10 min): Buscar artículos de investigación (paper) que usen el web scraping. 
-Fuente de datos, objetivo, método.
-    
+Fuente de datos, objetivo, método. 20:05. 
+
+Objetivo: Diseñar un algoritmo de recopilación de datos meteorológicos en tiempo real, para realizar análisis geográficos estadísticos del clima en Argentina.
+Fuente de datos: Estaciones meteorologicas automaticas (EMA) via API de wunderground
+Método: (ETL) Scraper hecho en PHP y curl para acceder a los sitios web y extraer las variables de interés (temperatura, presión atmosférica, humedad, etc), Normalización de datos y conversion de unidades, almacenamiento en una base de datos, y automatización en un sistema Linux usando cron. 
+URL: https://dialnet.unirioja.es/servlet/articulo?codigo=7273415 
+
+url: https://scielo.pt/pdf/rist/n52/1646-9895-rist-52-61.pdf 
+Objetivo: obtener datos sobre la empleabilidad de los egresados en México
+Fuentes de Datos: Sistema Nacional de Información Estadística Geografía (INEGI),  Asociación Nacional de Universidades e Instituciones de Educación Superior (ANUIES), Observatorio Laboral (OLA)
+Metodos usados: Escrapeado con octoparse, web escraper y webharvy
+
+Objetivo: obtener datos sobre la empleabilidad de los egresados en México
+Fuentes de Datos: Sistema Nacional de Información Estadística Geografía (INEGI),  Asociación Nacional de Universidades e Instituciones de Educación Superior (ANUIES), Observatorio Laboral (OLA)
+Metodos usados: Escrapeado con octoparse, web escraper y webharvy
+https://scielo.pt/pdf/rist/n52/1646-9895-rist-52-61.pdf 
+
+- *Objetivo:* Seguimiento de precios de criptomonedas
+- *Fuente de datos:* La fuente de datos de CoinMarketCap es la API de CoinMarketCap, que proporciona información sobre criptomonedas como precios, gráficos, y noticias: Datos actuales e históricos sobre Bitcoin y miles de altcoins, Información clave de la API, Enlaces oficiales, Documentación para desarrolladores.
+- Método: Abierto.  "Escuchamos activamente los comentarios/solicitudes de nuestros usuarios para enriquecer la calidad de los datos en nuestro sitio web."
+- url: https://coinmarketcap.com/
+
 ## Tecnologías de diseminación, extracción y almacenamiento Web
 
 Una vez elegida la *fuente de datos* (página web) y al menos con la intuición de lo que se quiere obtener, el siguiente paso es decidir el mecanismos para el scraping (raspado), esto esta relacionado al *tipo de pagina web*, ver si esta ofrece una entrada *API* y conocer sus limitaciones puede ser un punto de partida. Esto se denomina *Technologies for disseminating, extracting, and storing web data Collecting*, en el marco del uso de R la figura \ref{scrap1} muestra las interacciones entre ellas.
@@ -115,16 +135,28 @@ library(xtable)
 findPackage(c("API","scrape"),limit.results=-1)
 ```
 
-> Actividad 2
+> Actividad 2 (10min+10min) 21:15
 
 Siguiendo los 5 pasos mencionados anteriormente, defina un tema de interés.
 
-  1. Definir el tema:
-  2. Identificar fuentes (web):
-  3. Calidad de las fuentes:
-  4. Ventajas y desventajas:
-  5. Elegir la fuente:
-  6. Realizar el raspado web de la información de interés
+  1. Definir el tema: Inflación en Bolivia
+  2. Identificar fuentes (web): INE, Prensa (La Razón)
+  3. Calidad de las fuentes: INE *Completa*, Prensa (La Razón) *Inmediato Parcial* 
+  4. Ventajas y desventajas: 
+  5. Elegir la fuente: Ambas
+  6. Realizar el raspado web de la información de interés. (Tarea)
+  
+  1. Definir el tema: Medicamentos en Bolivia
+  2. Identificar fuentes (web): Farmacorp, Chavez, Bolivia
+  3. Calidad de las fuentes: Tiendas formales 
+  4. Ventajas y desventajas: Chavez (inestable), Bolivia (En mantenimiento)
+  5. Elegir la fuente: 
+
+  1. Definir el tema: Inflación sobre pobreza y desempleo
+  2. Identificar fuentes (web): Banco Mundial, FMI, OECD
+  3. Calidad de las fuentes: Buena
+  4. Ventajas y desventajas: Datos no oportunos, acceso a FMI 
+  5. Elegir la fuente: Banco Mundial
 
 ## HTML
 
@@ -141,8 +173,8 @@ Rvest es parte del universo **tidyverse** y esta orientada al scrape de páginas
 
 ```{r,eval=F}
 #desde CRAN
-install.packages("rvest")
-install.packages("dplyr")
+install.packages("rvest")# raspado
+install.packages("dplyr")# Manejo de dataset (SQL)
 #la versión en desarrollo desde github
 devtools::install_github("tidyverse/rvest")
 ```
@@ -160,52 +192,10 @@ Como se vio antes, una herramienta para facilitar la identificación del CSS o "
 rm(list = ls())
 library(rvest)
 library(dplyr)# gramática del manejo de datos (Tipo SQL)
-
-mean(iris$Petal.Length)#R de origen
-
-iris %>% select(Petal.Length, Petal.Width) %>% colMeans()
-iris$Petal.Length %>% mean()
-# %>% Operador pipe ctr mayus m
-# com1(com2(com3(..))) -> com1 %>% com2 %>% com3 (...)
-www1<-"https://www.urgente.bo/"
-urgente<-read_html(www1)
-
-urgente %>% html_nodes(".header-top-left") %>% html_nodes("p") %>% html_text2()
-
-urgente %>% html_nodes(".header-top-left p") %>% html_text2()
-
-urgente %>% html_nodes("h2") %>% html_text2()
-
-urgente %>% html_nodes(".normal-image-content")  %>% html_text2()
-
-titular<-urgente %>% html_nodes(".normal-image-content") %>% html_nodes("h2") %>% html_text2()
-
-informacion<-urgente %>% html_nodes(".normal-image-content p") %>% html_text2()
-
-bdu<-data.frame(titular, informacion)
-
-#raspado de la sección de deportes
-
-www2<-"https://www.urgente.bo/deportes?page="
-pg<-0
-deporte<-read_html(paste0(www2,pg))
-deporte %>% html_nodes(".news-box") %>% html_nodes(".clearfix") %>% html_children() %>% html_children() %>% html_children()
-
-aux<-deporte %>% html_nodes(".news-box") %>% html_nodes(".clearfix a") %>% html_attr("href")
-
-read_html(aux[40])
-
-deporte %>% html_nodes(".view-taxonomy-term .views-row h2 a") %>% html_attr("href")
-
-www3<-"https://www.worldometers.info/coronavirus/"
-covid<-read_html(www3)
-casos<-covid %>% html_nodes(".maincounter-number") %>% html_text2()
-casos<-as.numeric(gsub(",","",casos))
-
-covidt<-covid %>% html_table()
-covidt[[3]]
-
-load("~/Documentos/GitHub/aru_news/larazon.RData")
+#Ejemplo dplyr
+# Portal 1
+# Portal 2
+# Portal 3
 ```
 
 ### Ejemplo: enlaces descargables
