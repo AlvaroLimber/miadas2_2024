@@ -1,0 +1,554 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Pre procesamiento - Gramática del manejo de datos
+
+  - Recopilación
+  - Importación
+  - Exploración
+    * Diccionario de variables
+    * Niveles de agregación
+    * Descripción univariada 
+    * Identificando relaciones
+    * Aproximación Visual (Visualización)
+  - Filtrado y selección
+    * Filtrado de observaciones
+    * Selección de variables
+    * Pivot, Reshape
+    * Uniendo bases de datos
+  - Transformación
+    * Adecuación de formatos
+    * Limpieza de texto
+    * Creación de variables (ingeniería de características)
+    * Valores atípicos
+    * Valores perdidos (la no información es información)
+  - Muestreo, estimación, error estándar y confiabilidad
+    * Diseño muestral
+    * Estimación
+    * Rendimiento
+    
+## Recopilación
+
+  + Depende de la fuente de información de interés
+  + Puede llevar a un proceso de *recolección de datos*
+
+## Importación
+
+En el tema anterior, se vio con el uso de rvest la forma de conseguir datos de la web. 
+
+El primer paso que se debe seguir es identificar la *fuente de información* y el *formato* (.xlsx, .csv, .pdf, .sav, etc.)
+
+> Ejemplo: Se quiere estudiar la pobreza y su relación con la educación en el área urbano y rural. 
+
+> Ejemplo: Se quiere estudiar la relación entre los votos obtenidos por las dos principales fuerzas en la última elección a presidente de Bolivia. 
+
+> ¿Qué fuente de datos se puede usar, en que formato esta disponible?. ¿Es disponible la información?
+
+### Fuentes
+
+  - *Registros en la web* (raspado web)
+  - *Censos:* Cobertura total (recolección estadística)
+  - **Encuestas**: Cobertura parcial (muestra), pueden ser *representativas* o basadas en estudios de caso, sondeos, etc. (recolección estadística)
+  - *Registros administrativos (tradicionales):* Es información que se genera en formularios, informes, etc. Dentro de las empresas y negocios cuya finalidad es administrativa. (no tienen un objetivo estadístico)
+
+### Formatos
+
+En general la información puede estar en cualquier formato, sin embargo, existen formatos orientados a bases de datos:
+
+  + csv (archivo plano): Separador y el nombre de las variables (primera fila)
+  + .xls, xlsx Excel. 
+  + (microdatos) .sav SPSS, .dta Stata
+  + json, xml, sql (gestores de bases de datos)
+
+Traer una base de datos externa y cargarla en el sistema de interés. En nuestro caso en R.
+
+Hay varias librerías útiles para la importación
+
+```{r}
+rm(list=ls())
+library(haven)#SPSS, STATA
+library(labelled)#ETIQUETAS 
+library(readxl)#EXCEL
+```
+
+## Exploración
+
+Metadata del dataset:
+
+  - **Población Objetivo:** 
+  - **Unidad de análisis:** 
+  - **Unidad de información:** 
+  - **Unidades agregadas:** 
+  - **Cobertura espacial:** 
+  - **Cobertura temporal:** 
+  - **Cobertura temática:** 
+  - **Diseño estadístico:**
+  - **Documentación adicional:**
+  
+> Ejemplo: Exportaciones 2023, 2024  
+
+  - **Población Objetivo:** Operaciones de exportación realizadas el 2023 y 2024
+  - **Unidad de análisis:** Operaciones/transacciones
+  - **Unidad de información:** Punto de aduana
+  - **Unidades agregadas:** Aduana, producto, país, etc.
+  - **Cobertura espacial:** Nacional (puntos de aduana)
+  - **Cobertura temporal:** 2023, 2024 (mayo)
+  - **Cobertura temática:** Exportación, comercio exterior
+  - **Diseño estadístico:** Registro administrativo
+  - **Documentación adicional:** https://www.ine.gob.bo/index.php/estadisticas-economicas/comercio-exterior/metadatos-exportaciones/
+  
+### Diccionario de variables
+
+Es un **listado de las variables** y sus características de *formato* y alguna *información adicional*. Lo mas importante es saber que variables son *cualitativas* y cuales *cuantitativas*.
+
+Cuando existen muchas bases de datos dentro de nuestro dataset, o cuando tenemos varias unidades agregadas es importante identificar la variable de identificación única de las unidades de análisis ($KEY$, record linkage).
+
+```{r}
+str(exp23)
+View(exp23)
+View(imp23)
+```
+
+### Nombre de las variables
+
+Recomendaciones para los nombres de variables:
+
+  - Usar solo mayúsculas o minúsculas
+  - Evitar los espacios
+  - Evitar iniciar con números, o que el nombre de la variable sea un número
+  - Evitar símbolos y caracteres, evitar los acentos
+  - El nombre de la variable debiera ser corto (3 a 10) e informativo
+
+```{r}
+library(dplyr)
+names(exp23)
+names(exp23)<-tolower(names(exp23))#minuscula toupper(mayus)
+#renombrar variables
+exp23<-exp23 %>% rename(cadu=adudes, dadu=desadu)
+#aux<-exp23 %>% rename(cadu=dadu)
+class(exp23$cadu)
+typeof(exp23$cadu)
+apply(exp23, 2, typeof)
+```
+  
+### Reportes básicos
+
+  - Tablas de frecuencia
+  - *Medidas de tendencia central:* Media, mediana, moda, etc.
+  - *Medidas de variabilidad:* Varianza, desviación estándar, rango, etc.
+  - *Medidas de forma:* Cuantiles (acumulación); Cuartiles, quintiles, deciles, percentiles
+  
+```{r}
+#tablas de frecuencia
+table(exp23$dadu)
+t1<-exp23 %>% count(dadu)
+t2<-exp23 %>% count(cadu)
+t3<-exp23 %>% count(cadu, dadu)
+exp23 %>% count(depart)
+exp23 %>% count(desdep)
+#variables Numéricas
+#tendencia central
+mean(exp23$valor)
+median(exp23$valor)
+summary(exp23$valor)
+summary(exp23$gestion)
+
+exp23 %>% summarise(media=mean(valor), 
+                    mediana=median(valor),
+                    minimo=min(valor),
+                    maximo=max(valor))
+
+sd(exp23$valor)
+var(exp23$valor)
+exp23 %>% summarise(media=mean(valor), 
+                    mediana=median(valor),
+                    minimo=min(valor),
+                    maximo=max(valor),
+                    desv=sd(valor))
+quantile(exp23$valor, c(0.25,0.5,0.75))
+quantile(exp23$valor, seq(0,1,0.2))
+
+hist(exp23$valor)
+
+pdf("f1.pdf")
+boxplot(log(exp23$valor))
+dev.off()
+```
+  
+### Niveles de agregación
+
+La base de datos puede tener una unidad de investigación **elemental**, pero, puede tener también información de unidades de interés mas grandes, es decir; que agreguen a los unidades elementales.
+
+```{r}
+ta1<-exp23 %>% group_by(mes) %>% summarise(media=mean(valor),
+                    minimo=min(valor),
+                    maximo=max(valor),
+                    total=sum(valor),
+                    ope=n())
+#exportar a un excel
+library(writexl)
+write_xlsx(ta1, "exp_mes23.xlsx")
+
+ta2<-exp23 %>% group_by(cadu, mes) %>% summarise(media=mean(valor),
+                    minimo=min(valor),
+                    maximo=max(valor),
+                    total=sum(valor),
+                    ope=n())
+
+ta3<-exp23 %>% group_by(nandina, desnan) %>% summarise(total=sum(valor),
+          ope=n())
+
+exp23 %>% group_by(mes) %>% summarise(sum(valor))
+```
+
+## Filtrado y selección
+
+### Filtrado de observaciones
+
+El filtrado se refiere a seleccionar casos (*filas*) que cumplen una determinada condición. En la librería dplyr el comando filter se utiliza para esto.
+
+Para las condiciones en R se utilizan los operadores lógicos:
+
+  + Igualdad "=="
+  + Distinto "!="
+  + ó lógico "|"
+  + y lógico "&" 
+  + Negación "!"
+  + Desigualdad "<,>,>=,<="
+  + (Which) Múltiples condiciones (|) "%in%"
+
+```{r}
+# Operaciones realizadas en marzo de 2023
+exp23marzo<-exp23 %>% filter(mes==3)
+exp23 %>% filter(mes==3) %>% group_by(cadu) %>% summarise(total=sum(valor)) %>% arrange(-total)
+# Operaciones realizadas en el aeropuerto de EL Alto en los meses de Enero y diciembre
+exp23ea<-exp23 %>% filter(cadu==211 & (mes==1 | mes==12) )
+
+aux<-unique(exp23$despais)
+
+exp23 %>% filter(despais==aux[13])
+
+exp23 %>% filter(despais %in% aux[c(13,20,24)])
+```
+
+> Ejercicio: Todas las operaciones, excepto las que tienen un destino a Europa. (5 min.)
+
+```{r}
+aux<-unique(exp23$desarea)
+exp23 %>% filter(desarea %in% aux[c(1,12,16)] ) %>% count(despais) %>% View()
+
+exp23 %>% filter(!(desarea %in% aux[c(1,12,16)]) ) %>% count(despais) %>% View()
+
+exp23 %>% filter(desarea %in% aux[c(1,12,16)] )
+
+exp23_filtered <- exp23 %>% filter(!grepl("EUROPA", desarea, ignore.case = TRUE))
+```
+
+> Nota: En algunos casos, principalmente cuando el dataframe es muy grande, el filtrado puede usarse como un criterio de muestreo.
+
+```{r}
+rm(list=ls())
+library(dplyr)
+load("_data/ie2324.RData")
+set.seed(824)
+imp23s<-imp23 %>% sample_frac(0.1)
+imp23 %>% count(DESADU) %>% arrange(-n)
+imp23s %>% count(DESADU) %>% arrange(-n)
+```
+
+### Selección de variables
+
+Simplemente se refiere a la selección de variables, este proceso se recomienda realizarlo antes del *modelo*, ya que libera *memoria* y *optimiza* los tiempos de *procesamiento*, además, nos permite enfocarnos en las variables de interés. En la librería dplyr el comando es select.
+
+```{r}
+exp23 %>% summarise(sum(VALOR))
+exp23 %>% select(ADUDES, DESADU, NANDINA, DESNAN, VALOR, MES) %>% summarise(sum(VALOR))
+
+exp23 %>% select(ADUDES, DESADU, NANDINA, DESNAN, VALOR, MES) %>% filter(MES>=10)
+```
+
+## Transformación
+
+Se refiere a cambios en las variables o la base de datos. A nivel de las *variables* las transformaciones más comunes son:
+
+  - Adecuación de formatos
+  - Limpieza de texto
+  - Creación de variables
+  - Valores atípicos
+  - Valores perdidos
+
+La transformación a nivel del dataframe
+  
+  - Añadir filas 
+  - Añadir columnas
+  - Reshape, pivot
+
+### Adecuación de formatos
+
+Se refiere a cambiar la clase o el tipo de formato de una variable.
+
+  - as.factor, transforma una variable al tipo factor
+  - as.character, transforma una variable al tipo carácter-texto
+  - as.numeric, transforma una variable al tipo numérico
+  
+```{r}
+names(exp23)
+summary(exp23$DEPART)
+summary(as.factor(exp23$DEPART))
+summary(exp23)
+
+exp23<-exp23 %>% mutate(DEPART=as.factor(DEPART),
+                 ADUDES=as.factor(ADUDES),
+                 DESADU=as.factor(DESADU))
+exp23<-exp23 %>% mutate_at(vars(ADUDES, DESADU, FLUJO:CLTNT), as.factor)
+```
+  
+  
+### Limpieza de texto
+
+Para las variables de texto (character) se recomienda:
+
+  - Trabajar con mayúsculas o minúsculas
+  - Limpieza de espacios ("El Alto", "El  Alto")
+  - Tener control de caracteres extraños
+  
+```{r}
+library(stringr)
+####################
+str_replace("Hola","o","a")
+####################
+exp23$DESADU<-as.character(exp23$DESADU)
+
+aux<-unique(exp23$DESADU)
+
+str_replace(aux, aux[7], aux[8])
+
+exp23 %>% mutate(DESADU = case_when(
+  DESADU %in% aux[7] ~ "Frontera Villazón",
+  DESADU %in% aux[c(16,18)] ~ "Frontera Puerto Suárez",
+  DESADU %in% aux[19] ~ "Frontera Arroyo Concepción",
+  DESADU %in% aux[24] ~ "Frontera Guayaramerín",
+  DESADU %in% aux[12] ~ "Frontera Cañada Oruro",
+  .default = DESADU
+)) %>% count(DESADU) %>% View()
+
+exp23<-exp23 %>% mutate(DESADU = case_when(
+  DESADU %in% aux[7] ~ "Frontera Villazón",
+  DESADU %in% aux[c(16,18)] ~ "Frontera Puerto Suárez",
+  DESADU %in% aux[19] ~ "Frontera Arroyo Concepción",
+  DESADU %in% aux[24] ~ "Frontera Guayaramerín",
+  DESADU %in% aux[12] ~ "Frontera Cañada Oruro",
+  .default = DESADU
+))
+a1<-grep("Frontera Villaz", exp23$DESADU)
+exp23$DESADU[a1]<-"Frontera Villazón"
+
+tolower(exp23$DESADU)
+toupper(exp23$DESADU)
+#Sys.setlocale(category = "LC_ALL", locale = "es_ES.UTF-8")
+str_trim(" hola a    todos  ")
+str_squish(" hola a    todos  ")
+```
+  
+### Creación de variables
+
+Existen diferentes alternativas, estas normalmente deben estar orientadas a un indicador o para facilitar el manejo de alguna variable.
+
+  - Aplicar funciones: log
+  - Binarización (0/1 F/T)
+  - Discretización (cut, quantile)
+  - Estandarización
+  
+$$z=\frac{x-\bar{x}}{\sigma}$$
+
+  - Normalización Max/min (0 - 1)
+  
+$$y=\frac{x-min_x}{max_x-min_x}$$
+
+```{r}
+exp23<-exp23 %>% mutate(lvalor=log(VALOR))
+hist(exp23$VALOR)
+hist(exp23$lvalor)
+
+
+```
+
+$$valor_i=\beta_0+\beta_1pesoN+\epsilon_i$$
+$$log(valor_i)=\beta_0+\beta_1pesoN+\epsilon_i$$
+```{r}
+exp23<-exp23 %>% mutate(elalto=(ADUDES==211))
+exp23 %>% select(elalto)
+exp23<-exp23 %>% mutate(valor100k=(VALOR>100000))
+
+exp23 %>% summarise(mean(elalto), mean(valor100k))
+exp23 %>% group_by(MES) %>% summarise(elalto=mean(elalto)*100, valor100k=mean(valor100k)*100)
+summary(lm(lvalor~KILNET+elalto, data=exp23))
+summary(lm(VALOR~KILNET+elalto, data=exp23))
+#DISCRETIZACIÓN
+1:100
+cut(1:100,c(0,15,38,90,100))
+
+summary(exp23$VALOR)
+exp23 %>% mutate(cvalor = cut(VALOR,c(0,2003, 24755, 134890, 150250063), c("1C", "2C", "3C", "4C"))) %>% select(cvalor)
+
+exp23<-exp23 %>% mutate(svalor=scale(VALOR))
+exp23 %>% select(VALOR, lvalor, svalor) %>% summarise_all(sd)
+
+boxplot(exp23$VALOR)
+boxplot(exp23$lvalor)
+boxplot(exp23$svalor)
+
+#max min
+maxmin<-function(x){
+  y<-(x-min(x))/(max(x)-min(x))
+  return(y)
+}
+exp23<-exp23 %>% mutate(nvalor=maxmin(VALOR))
+summary(exp23$nvalor)
+boxplot(exp23$nvalor)
+```
+
+### Valores perdidos o valores *NAN*
+
+Se debe distinguir los siguientes casos:
+
+  - Cuando el valor no esta presente en el dataset por razones de filtro. Ejemplo: Los años de educación de personas menores de 5 años. El ingreso laboral de una persona que no trabaja
+  - Cuando el valor no este presente, pero debería estar. (No respuesta, rechazo)
+   
+Si el valor perdido es *aleatorio* se recomienda usar métodos de *imputación* u omitir los casos. En otro caso se recomienda usar métodos de imputación múltiples en la medida que sea posible. 
+
+Es posible, a partir de las transformaciones generar valores que no corresponde por ser indeterminados:
+
+  - log(-10) NaN
+  - log(0) -Inf
+  - 1/0 Inf
+  - 0/0 NaN
+  
+```{r}
+log(-100)
+log(0)
+1/0
+0/0
+log(exp23$svalor)
+boxplot(log(exp23$svalor))
+
+table(is.na(exp23$VALOR))
+table(is.na(exp23$FINO))
+exp23 %>% summarise(mean(VALOR), 
+                    mean(FINO, na.rm = T))
+
+exp23 %>% select(VALOR, FINO) %>% na.omit() %>% summarise(mean(VALOR), mean(FINO))
+
+exp23c<-exp23 %>% na.omit()
+library(mice)
+md.pattern(exp23)
+```
+  
+### Valores atípicos
+
+  - Hacer la diferencia entre valores atípicos *univariantes* de los *multivariantes* 
+  - En lo univariante
+    + Transformación logarítmica
+    + Partición de la base de datos (**estables**, atípicos). Se puede utilizar los quantiles (p99, p01) existen otros algoritmos (bacon)
+  - En lo multivariante
+    + Componentes principales (detección). Primer componente.
+    + Métodos de agrupamiento (kcenter, "k")
+
+```{r}
+plot(log(exp23$VALOR), log(exp23$KILBRU))
+```
+
+### Uniendo bases de datos
+
+La unión de bases de datos se puede entender en dos direcciones:
+
+  + Se añaden casos (filas)
+  + Se añaden variables (columnas)
+
+Para apilar las bases de datos, se debe asegurar que estas tengan las mismas variables e información adicional.
+
+```{r}
+rm(list = ls())
+load("_data/ie2324.RData")
+#Apilar
+sort(names(exp23))==sort(names(exp24))
+unlist(lapply(exp23, class))==unlist(lapply(exp24, class))
+table(unlist(lapply(exp23, class))==unlist(lapply(exp24, class)))
+
+exp2324<-exp23 %>% bind_rows(exp24)
+unique(exp2324$DESADU)
+
+#añadir columnas (record linkage)
+t1<-exp23 %>% group_by(MES) %>% summarise(vexp=sum(VALOR))
+
+t2<-imp23 %>% group_by(MES) %>% summarise(vimp=sum(FRO))
+
+t1 %>% inner_join(t2) %>% mutate(saldo=vexp-vimp)
+
+#NANDINA
+
+t3<-exp23 %>% group_by(NANDINA) %>% summarise(vexp=sum(VALOR))
+
+t4<-imp23 %>% group_by(NANDINA) %>% summarise(vimp=sum(FRO))
+
+t3 %>% inner_join(t4)
+t3 %>% left_join(t4)
+t3 %>% right_join(t4) 
+t3 %>% full_join(t4)
+load("_data/eh22.RData")
+```
+
+# Ejercicios resueltos
+
+```{r}
+rm(list=ls())
+library(haven)
+library(labelled)
+library(dplyr)
+```
+
+1. (EH22) Obtener el promedio de edad de las mujeres jefas de hogar
+
+```{r}
+load("_data/eh22.RData")
+eh22p %>% filter(s01a_05==1 & s01a_02==2) %>% summarise(promedio=mean(s01a_03)) 
+```
+
+2. (EH22) Obtener el porcentaje de hogares pobres moderados de los hogares que tengan personas menores de 12 años
+
+```{r}
+# Variable de pobreza moderada (pobreza por ingreso): p0
+# se puede explorar las etiquetas con: var_label(eh22p)
+#En una sola consulta
+eh22p %>% mutate(m12=(s01a_03<12)) %>% group_by(folio) %>% mutate(m12=max(m12)) %>% ungroup() %>%  filter(s01a_05==1 & m12==1) %>% summarise(pobreza=mean(p0)*100)
+# en varias consultas
+#1. Identificamos a las personas que tienen menos de 12 años
+aux<-eh22p %>% mutate(m12=(s01a_03<12))
+#2 se agrega la información a nivel de hogares
+aux1<-aux %>% group_by(folio) %>% summarise(m12=max(m12))
+#3 une con la información original y se filtran los casos a nivel de hogar usando el criterio del jefe de hogar (un solo jefe por hogar)
+eh22p %>% left_join(aux1) %>% filter(m12==1 & s01a_05==1) %>% summarise(pobreza=mean(p0)*100)
+```
+
+3. Obtener la descripción del  producto que tenga la mayor diferencia entre su valor de exportación e importación para el 2024
+
+```{r}
+rm(list = ls())
+load("_data/ie2324.RData")
+t1<-imp24 %>% group_by(NANDINA) %>% summarise(vimp=sum(FRO))
+t2<-exp24 %>% group_by(NANDINA) %>% summarise(vexp=sum(VALOR))
+t3<-t1 %>% inner_join(t2)
+t3 %>% mutate(aux=vexp-vimp) %>% arrange(-aux) %>% head(1)
+#buscando la descripción de 2711210000
+imp24 %>% count(NANDINA, DESNAN) %>% filter(NANDINA==2711210000) %>% select(DESNAN)
+```
+
+# Ejercicio propuestos
+
+1. (EH22) Obtenga el promedio de años de educación de personas mayores a 18 años, del área rural del departamento de Beni.
+
+2. (EH22) Obtenga el porcentaje de hogares con piso de tierra según el sexo del jefe/a de hogar
+
+3. Obtenga el mes y punto de aduana con el mayor saldo comercial de 2023.
