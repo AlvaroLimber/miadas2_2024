@@ -29,10 +29,10 @@ editor_options:
     * Estimación
     * Rendimiento
     
-## Recopilación
+## Recopilación (captura)
 
-  + Depende de la fuente de información de interés
-  + Puede llevar a un proceso de *recolección de datos*
+  + Depende de la fuente de información de interés. (Fuentes secundarias)
+  + Puede llevar a un proceso de *recolección de datos* (Fuente primaria)
 
 ## Importación
 
@@ -40,9 +40,9 @@ En el tema anterior, se vio con el uso de rvest la forma de conseguir datos de l
 
 El primer paso que se debe seguir es identificar la *fuente de información* y el *formato* (.xlsx, .csv, .pdf, .sav, etc.)
 
-> Ejemplo: Se quiere estudiar la pobreza y su relación con la educación en el área urbano y rural. 
+> Ejemplo: Se quiere estudiar la pobreza y su relación con la educación en el área urbano y rural. EH22
 
-> Ejemplo: Se quiere estudiar la relación entre los votos obtenidos por las dos principales fuerzas en la última elección a presidente de Bolivia. 
+> Ejemplo: Se quiere estudiar la relación entre los votos obtenidos por las dos principales fuerzas en la última elección a presidente de Bolivia. OEP (19:45). Atlas electoral (votos totales)
 
 > ¿Qué fuente de datos se puede usar, en que formato esta disponible?. ¿Es disponible la información?
 
@@ -71,6 +71,9 @@ rm(list=ls())
 library(haven)#SPSS, STATA
 library(labelled)#ETIQUETAS 
 library(readxl)#EXCEL
+e20<-read.csv("~/Descargas/votos_totales.csv", sep="|")
+save(e20, file = "_data/e20.RData")
+object.size(e20)/10^6
 ```
 
 ## Exploración
@@ -94,11 +97,23 @@ Metadata del dataset:
   - **Unidad de información:** Punto de aduana
   - **Unidades agregadas:** Aduana, producto, país, etc.
   - **Cobertura espacial:** Nacional (puntos de aduana)
-  - **Cobertura temporal:** 2023, 2024 (mayo)
+  - **Cobertura temporal:** 2023, 2024 (septiembre)
   - **Cobertura temática:** Exportación, comercio exterior
   - **Diseño estadístico:** Registro administrativo
   - **Documentación adicional:** https://www.ine.gob.bo/index.php/estadisticas-economicas/comercio-exterior/metadatos-exportaciones/
-  
+
+> Ejercicio, del dataset de las elecciones 2020, construir su metadata. (20:27)
+
+  - **Población Objetivo:** Población habilitada (>=18 años) para las elecciones nacionales 2020. 
+  - **Unidad de análisis:** Mesas electorales
+  - **Unidad de información:** Acta de la mesa
+  - **Unidades agregadas:** País, departamento, provincia, municipio, recinto
+  - **Cobertura espacial:** Bolivia
+  - **Cobertura temporal:** 2020
+  - **Cobertura temática:** Resultados electorales, preferencia electoral. 
+  - **Diseño estadístico:** Registro administrativo
+  - **Documentación adicional:** https://atlaselectoral.oep.org.bo/#/subproceso/107/1/1
+
 ### Diccionario de variables
 
 Es un **listado de las variables** y sus características de *formato* y alguna *información adicional*. Lo mas importante es saber que variables son *cualitativas* y cuales *cuantitativas*.
@@ -106,10 +121,19 @@ Es un **listado de las variables** y sus características de *formato* y alguna 
 Cuando existen muchas bases de datos dentro de nuestro dataset, o cuando tenemos varias unidades agregadas es importante identificar la variable de identificación única de las unidades de análisis ($KEY$, record linkage).
 
 ```{r}
-str(exp23)
-View(exp23)
-View(imp23)
+names(e20)
+class(e20$Codigo.PAIS)
+str(e20)
+
+mean(e20$Codigo.DEPARTAMENTO)
+mean(factor(e20$Codigo.DEPARTAMENTO))
+sqrt(e20$Codigo.MUNICIPIO)
+
+summary(e20)
 ```
+
+  - Cuantitativas: Se pueden realizar funciones matemáticas y estas tienen una utilidad para el análisis.
+  - Cualitativas: No se pueden aplicar funciones matemáticas.
 
 ### Nombre de las variables
 
@@ -122,23 +146,68 @@ Recomendaciones para los nombres de variables:
   - El nombre de la variable debiera ser corto (3 a 10) e informativo
 
 ```{r}
+#toupper
+names(e20)<-tolower(names(e20))
+names(e20)
+gsub("\\.", "-" , names(e20))
+names(e20)<-gsub("codigo.", "i", names(e20))
 library(dplyr)
-names(exp23)
-names(exp23)<-tolower(names(exp23))#minuscula toupper(mayus)
-#renombrar variables
-exp23<-exp23 %>% rename(cadu=adudes, dadu=desadu)
-#aux<-exp23 %>% rename(cadu=dadu)
-class(exp23$cadu)
-typeof(exp23$cadu)
-apply(exp23, 2, typeof)
+e20<-e20 %>% rename(idep=idepartamento)
+e20<-e20 %>% rename(ipro=iprovincia, 
+               imun=imunicipio,
+               ddep=nombre.departamento,
+               dpro=nombre.provincia,
+               dmun=nombre.municipio)
+names(e20)
+apply(e20, 2, class)
+apply(e20, 2, mean)
+A<-matrix(1:20, 5, 4)
+apply(A, 1, mean)
+e20<-e20 %>% rename(válidos=validos)
+e20<-e20 %>% rename('partido adn'=adn)
+names(e20)
+e20$válidos
+e20$`partido adn`
 ```
   
 ### Reportes básicos
 
-  - Tablas de frecuencia
+  - Tablas de frecuencia: Conteo de casos. Principalmente para variables cualitativas
   - *Medidas de tendencia central:* Media, mediana, moda, etc.
   - *Medidas de variabilidad:* Varianza, desviación estándar, rango, etc.
-  - *Medidas de forma:* Cuantiles (acumulación); Cuartiles, quintiles, deciles, percentiles
+  - *Medidas de forma:* Cuantiles (acumulación); Cuartiles, quintiles, deciles, percentiles, asimetría, apuntalamiento 
+  
+$$\sigma^2=\frac{\sum_U (x_i-\mu)^2}{N}$$  
+
+$$s^2=\frac{\sum_s (x_i-\bar{x})^2}{n-1}$$
+  
+```{r}
+v1<-c(5,5,5,5,5)#R=0
+v2<-c(4,4,5,6,6)#R=2
+v3<-c(1,3,5,7,9)#R=8
+mean(v1)
+mean(v2)
+median(v1)
+median(v2)
+mean(v3)
+median(v3)
+sd(v1)
+sd(v2)
+sd(v3)
+var(v1)
+var(v2)
+var(v3)
+sum((v3-mean(v3))^2)/5
+sum((v3-mean(v3))^2)/4
+mean(e20$mas.ipsp)
+mean(e20$cc)
+median(e20$mas.ipsp)
+median(e20$cc)
+sd(e20$mas.ipsp)
+sd(e20$cc)
+```
+  
+  
   
 ```{r}
 #tablas de frecuencia
