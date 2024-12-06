@@ -207,8 +207,6 @@ sd(e20$mas.ipsp)
 sd(e20$cc)
 ```
   
-  
-  
 ```{r}
 #tablas de frecuencia
 table(exp23$dadu)
@@ -251,25 +249,7 @@ dev.off()
 La base de datos puede tener una unidad de investigación **elemental**, pero, puede tener también información de unidades de interés mas grandes, es decir; que agreguen a los unidades elementales.
 
 ```{r}
-ta1<-exp23 %>% group_by(mes) %>% summarise(media=mean(valor),
-                    minimo=min(valor),
-                    maximo=max(valor),
-                    total=sum(valor),
-                    ope=n())
-#exportar a un excel
-library(writexl)
-write_xlsx(ta1, "exp_mes23.xlsx")
 
-ta2<-exp23 %>% group_by(cadu, mes) %>% summarise(media=mean(valor),
-                    minimo=min(valor),
-                    maximo=max(valor),
-                    total=sum(valor),
-                    ope=n())
-
-ta3<-exp23 %>% group_by(nandina, desnan) %>% summarise(total=sum(valor),
-          ope=n())
-
-exp23 %>% group_by(mes) %>% summarise(sum(valor))
 ```
 
 ## Filtrado y selección
@@ -289,42 +269,19 @@ Para las condiciones en R se utilizan los operadores lógicos:
   + (Which) Múltiples condiciones (|) "%in%"
 
 ```{r}
-# Operaciones realizadas en marzo de 2023
-exp23marzo<-exp23 %>% filter(mes==3)
-exp23 %>% filter(mes==3) %>% group_by(cadu) %>% summarise(total=sum(valor)) %>% arrange(-total)
-# Operaciones realizadas en el aeropuerto de EL Alto en los meses de Enero y diciembre
-exp23ea<-exp23 %>% filter(cadu==211 & (mes==1 | mes==12) )
 
-aux<-unique(exp23$despais)
-
-exp23 %>% filter(despais==aux[13])
-
-exp23 %>% filter(despais %in% aux[c(13,20,24)])
 ```
 
 > Ejercicio: Todas las operaciones, excepto las que tienen un destino a Europa. (5 min.)
 
 ```{r}
-aux<-unique(exp23$desarea)
-exp23 %>% filter(desarea %in% aux[c(1,12,16)] ) %>% count(despais) %>% View()
 
-exp23 %>% filter(!(desarea %in% aux[c(1,12,16)]) ) %>% count(despais) %>% View()
-
-exp23 %>% filter(desarea %in% aux[c(1,12,16)] )
-
-exp23_filtered <- exp23 %>% filter(!grepl("EUROPA", desarea, ignore.case = TRUE))
 ```
 
 > Nota: En algunos casos, principalmente cuando el dataframe es muy grande, el filtrado puede usarse como un criterio de muestreo.
 
 ```{r}
-rm(list=ls())
-library(dplyr)
-load("_data/ie2324.RData")
-set.seed(824)
-imp23s<-imp23 %>% sample_frac(0.1)
-imp23 %>% count(DESADU) %>% arrange(-n)
-imp23s %>% count(DESADU) %>% arrange(-n)
+
 ```
 
 ### Selección de variables
@@ -332,10 +289,7 @@ imp23s %>% count(DESADU) %>% arrange(-n)
 Simplemente se refiere a la selección de variables, este proceso se recomienda realizarlo antes del *modelo*, ya que libera *memoria* y *optimiza* los tiempos de *procesamiento*, además, nos permite enfocarnos en las variables de interés. En la librería dplyr el comando es select.
 
 ```{r}
-exp23 %>% summarise(sum(VALOR))
-exp23 %>% select(ADUDES, DESADU, NANDINA, DESNAN, VALOR, MES) %>% summarise(sum(VALOR))
 
-exp23 %>% select(ADUDES, DESADU, NANDINA, DESNAN, VALOR, MES) %>% filter(MES>=10)
 ```
 
 ## Transformación
@@ -363,15 +317,7 @@ Se refiere a cambiar la clase o el tipo de formato de una variable.
   - as.numeric, transforma una variable al tipo numérico
   
 ```{r}
-names(exp23)
-summary(exp23$DEPART)
-summary(as.factor(exp23$DEPART))
-summary(exp23)
 
-exp23<-exp23 %>% mutate(DEPART=as.factor(DEPART),
-                 ADUDES=as.factor(ADUDES),
-                 DESADU=as.factor(DESADU))
-exp23<-exp23 %>% mutate_at(vars(ADUDES, DESADU, FLUJO:CLTNT), as.factor)
 ```
   
   
@@ -385,40 +331,7 @@ Para las variables de texto (character) se recomienda:
   
 ```{r}
 library(stringr)
-####################
-str_replace("Hola","o","a")
-####################
-exp23$DESADU<-as.character(exp23$DESADU)
-
-aux<-unique(exp23$DESADU)
-
-str_replace(aux, aux[7], aux[8])
-
-exp23 %>% mutate(DESADU = case_when(
-  DESADU %in% aux[7] ~ "Frontera Villazón",
-  DESADU %in% aux[c(16,18)] ~ "Frontera Puerto Suárez",
-  DESADU %in% aux[19] ~ "Frontera Arroyo Concepción",
-  DESADU %in% aux[24] ~ "Frontera Guayaramerín",
-  DESADU %in% aux[12] ~ "Frontera Cañada Oruro",
-  .default = DESADU
-)) %>% count(DESADU) %>% View()
-
-exp23<-exp23 %>% mutate(DESADU = case_when(
-  DESADU %in% aux[7] ~ "Frontera Villazón",
-  DESADU %in% aux[c(16,18)] ~ "Frontera Puerto Suárez",
-  DESADU %in% aux[19] ~ "Frontera Arroyo Concepción",
-  DESADU %in% aux[24] ~ "Frontera Guayaramerín",
-  DESADU %in% aux[12] ~ "Frontera Cañada Oruro",
-  .default = DESADU
-))
-a1<-grep("Frontera Villaz", exp23$DESADU)
-exp23$DESADU[a1]<-"Frontera Villazón"
-
-tolower(exp23$DESADU)
-toupper(exp23$DESADU)
-#Sys.setlocale(category = "LC_ALL", locale = "es_ES.UTF-8")
-str_trim(" hola a    todos  ")
-str_squish(" hola a    todos  ")
+library(stringi)
 ```
   
 ### Creación de variables
@@ -437,46 +350,7 @@ $$z=\frac{x-\bar{x}}{\sigma}$$
 $$y=\frac{x-min_x}{max_x-min_x}$$
 
 ```{r}
-exp23<-exp23 %>% mutate(lvalor=log(VALOR))
-hist(exp23$VALOR)
-hist(exp23$lvalor)
 
-
-```
-
-$$valor_i=\beta_0+\beta_1pesoN+\epsilon_i$$
-$$log(valor_i)=\beta_0+\beta_1pesoN+\epsilon_i$$
-```{r}
-exp23<-exp23 %>% mutate(elalto=(ADUDES==211))
-exp23 %>% select(elalto)
-exp23<-exp23 %>% mutate(valor100k=(VALOR>100000))
-
-exp23 %>% summarise(mean(elalto), mean(valor100k))
-exp23 %>% group_by(MES) %>% summarise(elalto=mean(elalto)*100, valor100k=mean(valor100k)*100)
-summary(lm(lvalor~KILNET+elalto, data=exp23))
-summary(lm(VALOR~KILNET+elalto, data=exp23))
-#DISCRETIZACIÓN
-1:100
-cut(1:100,c(0,15,38,90,100))
-
-summary(exp23$VALOR)
-exp23 %>% mutate(cvalor = cut(VALOR,c(0,2003, 24755, 134890, 150250063), c("1C", "2C", "3C", "4C"))) %>% select(cvalor)
-
-exp23<-exp23 %>% mutate(svalor=scale(VALOR))
-exp23 %>% select(VALOR, lvalor, svalor) %>% summarise_all(sd)
-
-boxplot(exp23$VALOR)
-boxplot(exp23$lvalor)
-boxplot(exp23$svalor)
-
-#max min
-maxmin<-function(x){
-  y<-(x-min(x))/(max(x)-min(x))
-  return(y)
-}
-exp23<-exp23 %>% mutate(nvalor=maxmin(VALOR))
-summary(exp23$nvalor)
-boxplot(exp23$nvalor)
 ```
 
 ### Valores perdidos o valores *NAN*
@@ -496,23 +370,8 @@ Es posible, a partir de las transformaciones generar valores que no corresponde 
   - 0/0 NaN
   
 ```{r}
-log(-100)
-log(0)
-1/0
-0/0
-log(exp23$svalor)
-boxplot(log(exp23$svalor))
-
-table(is.na(exp23$VALOR))
-table(is.na(exp23$FINO))
-exp23 %>% summarise(mean(VALOR), 
-                    mean(FINO, na.rm = T))
-
-exp23 %>% select(VALOR, FINO) %>% na.omit() %>% summarise(mean(VALOR), mean(FINO))
-
-exp23c<-exp23 %>% na.omit()
 library(mice)
-md.pattern(exp23)
+md.pattern()
 ```
   
 ### Valores atípicos
@@ -525,10 +384,6 @@ md.pattern(exp23)
     + Componentes principales (detección). Primer componente.
     + Métodos de agrupamiento (kcenter, "k")
 
-```{r}
-plot(log(exp23$VALOR), log(exp23$KILBRU))
-```
-
 ### Uniendo bases de datos
 
 La unión de bases de datos se puede entender en dos direcciones:
@@ -539,44 +394,10 @@ La unión de bases de datos se puede entender en dos direcciones:
 Para apilar las bases de datos, se debe asegurar que estas tengan las mismas variables e información adicional.
 
 ```{r}
-rm(list = ls())
-load("_data/ie2324.RData")
-#Apilar
-sort(names(exp23))==sort(names(exp24))
-unlist(lapply(exp23, class))==unlist(lapply(exp24, class))
-table(unlist(lapply(exp23, class))==unlist(lapply(exp24, class)))
 
-exp2324<-exp23 %>% bind_rows(exp24)
-unique(exp2324$DESADU)
-
-#añadir columnas (record linkage)
-t1<-exp23 %>% group_by(MES) %>% summarise(vexp=sum(VALOR))
-
-t2<-imp23 %>% group_by(MES) %>% summarise(vimp=sum(FRO))
-
-t1 %>% inner_join(t2) %>% mutate(saldo=vexp-vimp)
-
-#NANDINA
-
-t3<-exp23 %>% group_by(NANDINA) %>% summarise(vexp=sum(VALOR))
-
-t4<-imp23 %>% group_by(NANDINA) %>% summarise(vimp=sum(FRO))
-
-t3 %>% inner_join(t4)
-t3 %>% left_join(t4)
-t3 %>% right_join(t4) 
-t3 %>% full_join(t4)
-load("_data/eh22.RData")
 ```
 
 # Ejercicios resueltos
-
-```{r}
-rm(list=ls())
-library(haven)
-library(labelled)
-library(dplyr)
-```
 
 1. (EH22) Obtener el promedio de edad de las mujeres jefas de hogar
 
@@ -620,4 +441,12 @@ imp24 %>% count(NANDINA, DESNAN) %>% filter(NANDINA==2711210000) %>% select(DESN
 
 2. (EH22) Obtenga el porcentaje de hogares con piso de tierra según el sexo del jefe/a de hogar
 
-3. Obtenga el mes y punto de aduana con el mayor saldo comercial de 2023.
+3. Replique los datos de la figura de saldo comercial que usa el INE en su portal 
+
+4. Obtenga el mes y punto de aduana con el mayor saldo comercial de 2023.
+
+5. En que municipio la razón de apoyo porcentual entre el CC y MAS es más alto
+
+6. En que reciento del departamento de Pando existieron en términos relativos mas votos nulos
+
+7. Investigar el uso de las funciones; pivot_longer, pivot_wider
