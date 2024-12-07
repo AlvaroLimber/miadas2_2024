@@ -243,20 +243,73 @@ pdf("f1.pdf")
 boxplot(log(exp23$valor))
 dev.off()
 ```
+
+
   
 ### Niveles de agregación
 
 La base de datos puede tener una unidad de investigación **elemental**, pero, puede tener también información de unidades de interés mas grandes, es decir; que agreguen a los unidades elementales.
 
 ```{r}
+rm(list = ls())
+library(dplyr)# gramática de datos 
+library(labelled)
+library(haven)
+#######################
+load(url("https://github.com/AlvaroLimber/miadas2_2024/raw/refs/heads/main/_data/e20.RData"))
+load(url("https://github.com/AlvaroLimber/miadas2_2024/raw/refs/heads/main/_data/eh22.RData"))
+load(url("https://github.com/AlvaroLimber/miadas2_2024/raw/refs/heads/main/_data/ie2324.RData"))
+#######################
+#tablas de frecuencia conteos, %
+names(e20)<-tolower(names(e20))
+names(e20)
+# R base
+table(e20$nombre.departamento)
+#dplyr dataframe -> dataframe
+e20 %>% count(nombre.departamento)
+e20 %>% count(nombre.departamento, name="Mesas")
+e20 %>% count(Departamento=nombre.departamento, name="Mesas")
+e20 %>% count(Departamento=nombre.departamento, name="Mesas") %>% arrange(-Mesas)
+t1<-e20 %>% count(nombre.departamento, nombre.provincia)
+View(t1)
 
+e20 %>% group_by(Departamento=nombre.departamento) %>% summarise(Mesas=n(), tnulos=sum(nulos), mas=sum(mas.ipsp), cc=sum(cc))
+
+t2<-e20 %>% group_by(Departamento=nombre.departamento, nombre.provincia, nombre.municipio) %>% summarise(Mesas=n(), tnulos=sum(nulos), mas=sum(mas.ipsp), cc=sum(cc))
+
+e20 %>% summarise(sum(validos), sum(nulos))
+#tendencia central
+e20 %>% summarise(media_mas=mean(mas.ipsp), mediana_mas=median(mas.ipsp), mean(cc), median(cc))
+#Variabilidad
+e20 %>% summarise(sd(mas.ipsp), sd(cc))
+e20 %>% group_by(nombre.departamento) %>% summarise(mas=sd(mas.ipsp), cc=sd(cc))
+
+cv<-function(x){
+  return(sd(x)/mean(x))
+}
+
+e20 %>% summarise(cv(mas.ipsp), cv(cc))
+e20 %>% group_by(nombre.departamento) %>% summarise(mas=cv(mas.ipsp), cc=cv(cc))
+
+boxplot(e20$cc)
+boxplot(e20$cc ~ e20$nombre.departamento)
+boxplot(e20$mas.ipsp ~ e20$nombre.departamento)
+quantile(e20$cc)
+quantile(e20$cc, c(0.1, 0.4, 0.8))
+
+e20 %>% group_by(nombre.departamento) %>% summarise(q10=quantile(cc, c(0.1)))
+
+e20 %>% summarise_at(vars(cc, mas.ipsp), sum)
+e20 %>% summarise_at(vars(adn:validos), sum)
 ```
+
+$$cv(x)=\frac{\sigma_x}{\bar{x}}$$
 
 ## Filtrado y selección
 
 ### Filtrado de observaciones
 
-El filtrado se refiere a seleccionar casos (*filas*) que cumplen una determinada condición. En la librería dplyr el comando filter se utiliza para esto.
+El filtrado se refiere a seleccionar casos (*filas*) que cumplen una determinada condición. En la librería dplyr el comando *filter* se utiliza para esto.
 
 Para las condiciones en R se utilizan los operadores lógicos:
 
@@ -269,19 +322,37 @@ Para las condiciones en R se utilizan los operadores lógicos:
   + (Which) Múltiples condiciones (|) "%in%"
 
 ```{r}
-
+e20 %>% filter(nulos>100)
+e20pando<-e20 %>% filter(nombre.departamento=="PANDO")
+t3<-e20 %>% filter(nombre.departamento=="PANDO" & mas.ipsp<cc & cc>creemos & nulos==0)
 ```
 
-> Ejercicio: Todas las operaciones, excepto las que tienen un destino a Europa. (5 min.)
+> Ejercicio: Exportaciones 2023, total de las operaciones, excepto las que tienen un destino a Europa. (5 min.) 20:45.
 
 ```{r}
+e20$nombre.departamento
+unique(e20$nombre.departamento)
+unique(e23$DESPAIS)
 
+grep("EUR" , unique(e23$DESAREA))
+aux<-unique(e23$DESAREA)[c(1,12,16)]
+
+e23 %>% filter(DESAREA != "UNION EUROPEA" & DESAREA!="RESTO DE EUROPA") %>% summarise(total = sum(VALOR), n())
+
+e23 %>% filter(!(DESAREA %in% aux) ) %>% summarise(total = sum(VALOR), n())
+
+e23 %>% filter(!(DESAREA =="UNION EUROPEA" | 
+                  DESAREA =="RESTO DE EUROPA" |
+                    DESAREA =="ASOCIACION EUROPEA DE LIBRE COMERCIO")) %>% summarise(total = sum(VALOR), n())
 ```
 
 > Nota: En algunos casos, principalmente cuando el dataframe es muy grande, el filtrado puede usarse como un criterio de muestreo.
 
 ```{r}
-
+e23 %>% sample_n(size = 1000)
+set.seed(2100)
+se23<-e23 %>% sample_frac(0.1)
+sum(se23$VALOR)
 ```
 
 ### Selección de variables
@@ -289,12 +360,17 @@ Para las condiciones en R se utilizan los operadores lógicos:
 Simplemente se refiere a la selección de variables, este proceso se recomienda realizarlo antes del *modelo*, ya que libera *memoria* y *optimiza* los tiempos de *procesamiento*, además, nos permite enfocarnos en las variables de interés. En la librería dplyr el comando es select.
 
 ```{r}
-
+e20 %>% select(nombre.departamento, validos)
+e20 %>% select(adn:validos)
+e20<-e20 %>% select(-adn, -libre.21, -juntos)
+names(e20)
+unique(e20$nombre.pais)
+e20<-e20 %>% select(-1, -2)
 ```
 
 ## Transformación
 
-Se refiere a cambios en las variables o la base de datos. A nivel de las *variables* las transformaciones más comunes son:
+Se refiere a cambios en las variables o del dataframe. A nivel de las *variables* las transformaciones más comunes son:
 
   - Adecuación de formatos
   - Limpieza de texto
@@ -306,7 +382,7 @@ La transformación a nivel del dataframe
   
   - Añadir filas 
   - Añadir columnas
-  - Reshape, pivot
+  - Reshape, pivot 
 
 ### Adecuación de formatos
 
@@ -317,9 +393,27 @@ Se refiere a cambiar la clase o el tipo de formato de una variable.
   - as.numeric, transforma una variable al tipo numérico
   
 ```{r}
+str(e20)
+e20<-e20 %>% mutate(codigo.departamento=as.factor(codigo.departamento), 
+               codigo.provincia=as.factor(codigo.provincia),
+               codigo.municipio=as.factor(codigo.municipio),
+               codigo.recinto=as.character(codigo.recinto),
+               codigo.mesa=as.character(codigo.mesa)
+               )
+str(e20)
 
+e20 %>% filter(nombre.departamento=="CHUQUISACA")
+eh22p %>% filter(depto==1)
+lm(cc ~ nombre.departamento, data = e20)
+factor(c(1,1,2,2,4,5), c(1,2,4,5), c("a","b","r","t"))
+
+names(eh22p)
+var_label(eh22p)
+var_label(eh22p$s01a_02)
+val_labels(eh22p$niv_ed)
+eh22p %>% filter(niv_ed==5)
+eh22p %>% group_by(Departamento=to_factor(depto)) %>% summarise(Edad=mean(s01a_03))
 ```
-  
   
 ### Limpieza de texto
 
@@ -449,4 +543,4 @@ imp24 %>% count(NANDINA, DESNAN) %>% filter(NANDINA==2711210000) %>% select(DESN
 
 6. En que reciento del departamento de Pando existieron en términos relativos mas votos nulos
 
-7. Investigar el uso de las funciones; pivot_longer, pivot_wider
+7. Investigar el uso de las funciones; pivot_longer, pivot_wider (tidyr)
