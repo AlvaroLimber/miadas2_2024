@@ -420,12 +420,56 @@ eh22p %>% group_by(Departamento=to_factor(depto)) %>% summarise(Edad=mean(s01a_0
 Para las variables de texto (character) se recomienda:
 
   - Trabajar con mayúsculas o minúsculas
-  - Limpieza de espacios ("El Alto", "El  Alto")
+  - Limpieza de espacios (" El  Alto ", "El  Alto")
   - Tener control de caracteres extraños
   
 ```{r}
+rm(list = ls())
+library(dplyr)
+library(haven)
+library(labelled)
 library(stringr)
 library(stringi)
+library(rvest)
+############################
+www<-"https://www.worldometers.info/world-population/population-by-country/"
+pob<-read_html(www)
+t1<-pob %>% html_table()
+t1<-t1[[1]]
+############################
+summary(t1)
+t1<-t1 %>% select(-1)
+names(t1)<-names(t1) %>% tolower() %>% str_remove("\\(") %>% str_remove("\\)") %>% str_remove("/") %>% str_remove("²") %>% str_remove("%") %>% str_trim() %>% str_replace_all(" ",".") %>% str_replace("\\.\\.",".")
+names(t1)
+
+t1 %>% mutate(
+  pob24=as.numeric(str_remove_all(population.2024, "\\,"))) %>% select(population.2024, pob24)
+
+limpieza<-function(x){
+  x %>% str_remove_all("\\,") %>% str_remove("%") %>% as.numeric() %>% return()
+}
+limpieza(t1$urban.pop)
+
+t1 %>% mutate(population.2024=limpieza(population.2024))
+t2<-t1 %>% mutate_at(vars(population.2024:world.share), limpieza)
+summary(t2)
+
+str_replace(str_remove("234,345,44","\\,"), "\\,", ".") %>% as.numeric()
+library(tm)
+library(lubridate)#fechas
+class(today())
+ymd("24/12/7")
+aux<-dmy("7 dic, 2024")
+class(aux)
+year(aux)
+day(aux)
+month(aux)
+date(aux)
+?mdy_hms()
+dmy_hms("20/2/06 11:16:16.683")
+library(help=lubridate)
+mean(t2$urban.pop)
+cor(t2[,-1])
 ```
   
 ### Creación de variables
@@ -435,7 +479,7 @@ Existen diferentes alternativas, estas normalmente deben estar orientadas a un i
   - Aplicar funciones: log
   - Binarización (0/1 F/T)
   - Discretización (cut, quantile)
-  - Estandarización
+  - Estandarización 
   
 $$z=\frac{x-\bar{x}}{\sigma}$$
 
@@ -444,14 +488,80 @@ $$z=\frac{x-\bar{x}}{\sigma}$$
 $$y=\frac{x-min_x}{max_x-min_x}$$
 
 ```{r}
+rm(list = ls())
+load(url("https://github.com/AlvaroLimber/miadas2_2024/raw/refs/heads/main/_data/eh22.RData"))
+#diccionario
+var_label(eh22v)
+val_labels(eh22v)
+############
+var_label(eh22p$ylab)
+summary(eh22p$ylab)
+boxplot(eh22p$ylab)
+plot(density(log(eh22p$ylab), na.rm =T ))
 
+eh22p<-eh22p %>% mutate(lylab=log(ylab))
+eh22p %>% select(ylab, lylab)
+
+# Binarización (0/1 F/T)
+eh22p<-eh22p %>% mutate(rural=(area==2))
+table(eh22p$rural)
+eh22p %>% group_by(depto) %>% summarise(mean(rural)*100)
+mean(eh22p$rural)
+
+eh22p %>% mutate(nna =(s01a_03<18)) %>% group_by(area) %>%  summarise(mean(nna)*100, sum(nna))
+
+#Porcentaje por departamento de personas; mujeres, área rural y no tengan ninguna educación. 
+eh22p %>% mutate(aux=(s01a_02==2 & area==2 & aestudio==17)) %>% group_by(depto) %>% summarise(p=mean(aux, na.rm = T )*100) %>% arrange(p)
+
+# Crear un dataframe con los casos de mujeres jefas de hogar
+ehjefa<-eh22p %>% mutate(jefa = (s01a_02==2 & s01a_05==1)) %>% filter(jefa)
+
+ehjefa<-eh22p %>% filter(s01a_02==2 & s01a_05==1)
+# mutate group_by
+eh22p %>% select(folio, edad=s01a_03) %>% group_by(folio) %>% mutate(maxedad=max(edad), dif=maxedad-edad)
+
+eh22p<-eh22p %>% rename(edad=s01a_03) %>% group_by(folio) %>% mutate(maxedad=max(edad), dif=maxedad-edad)
+
+eh22p %>% group_by(depto) %>% summarise(mean(edad)) 
+eh22p %>% mutate(adulta=edad>=60) %>% group_by(depto) %>% summarise(mean(adulta)) 
+
+eh22p %>% group_by(folio) %>% mutate(minedad=mean(edad)) %>% select(folio, edad, minedad) 
+
+eh22p %>% group_by(folio) %>% summarise(mean(edad))
+
+eh22p %>% group_by(s01a_02) %>% summarise(max(edad))
+eh22p %>% group_by(s01a_02, area) %>% mutate(aux=max(edad)) %>% select(area, s01a_02, edad,aux)
+#save(eh22p, file = "")
+# Discretización (cut, quantile)
+cut(1:100, c(0,40,80,100))
+summary(eh22p$edad)
+cut(eh22p$edad, c(0, 17, 59, 98), include.lowest = T)
+
+cut(eh22p$edad, quantile(eh22p$edad), include.lowest = T)
+
+eh22p %>% ungroup() %>% mutate(
+  gedad=cut(edad, c(0, 17, 59, 98), include.lowest = T),
+  qedad=cut(edad, quantile(edad), include.lowest=T )) %>% select(edad, gedad, qedad)
+# Estandarización 
+boxplot(eh22p$edad)
+boxplot(scale(eh22p$edad))
+eh22p %>% ungroup() %>% mutate(sedad=scale(edad)) %>% select(edad, sedad)
+# Normalización (max-min) 
+maxmin<-function(x){
+  return((x-min(x))/max(x)-min(x))
+}
+eh22p<-eh22p %>% ungroup() %>% 
+  mutate(sedad=scale(edad),
+         nedad=maxmin(edad)
+         )
+plot(eh22p$sedad, eh22p$nedad)
 ```
 
-### Valores perdidos o valores *NAN*
+### Valores perdidos (NA) o valores *NAN*
 
 Se debe distinguir los siguientes casos:
 
-  - Cuando el valor no esta presente en el dataset por razones de filtro. Ejemplo: Los años de educación de personas menores de 5 años. El ingreso laboral de una persona que no trabaja
+  - Cuando el valor no esta presente en el dataset por razones de filtro. Ejemplo: Los años de educación de personas menores de 4 años. El ingreso laboral de una persona que no trabaja
   - Cuando el valor no este presente, pero debería estar. (No respuesta, rechazo)
    
 Si el valor perdido es *aleatorio* se recomienda usar métodos de *imputación* u omitir los casos. En otro caso se recomienda usar métodos de imputación múltiples en la medida que sea posible. 
@@ -465,7 +575,10 @@ Es posible, a partir de las transformaciones generar valores que no corresponde 
   
 ```{r}
 library(mice)
-md.pattern()
+md.pattern(eh22p %>% select(ylab, edad, aestudio,p0 ))
+?mice()
+t3<-eh22p %>% select(edad, p0, aestudio, ylab) %>% na.omit()
+mean(eh22p$aestudio , na.rm = T)
 ```
   
 ### Valores atípicos
@@ -473,8 +586,8 @@ md.pattern()
   - Hacer la diferencia entre valores atípicos *univariantes* de los *multivariantes* 
   - En lo univariante
     + Transformación logarítmica
-    + Partición de la base de datos (**estables**, atípicos). Se puede utilizar los quantiles (p99, p01) existen otros algoritmos (bacon)
-  - En lo multivariante
+    + Partición de la base de datos (**estables**, atípicos). Se puede utilizar los quantiles (p99, p01) existen otros algoritmos (bacon tarea)
+  - En lo **multivariante**
     + Componentes principales (detección). Primer componente.
     + Métodos de agrupamiento (kcenter, "k")
 
@@ -488,7 +601,18 @@ La unión de bases de datos se puede entender en dos direcciones:
 Para apilar las bases de datos, se debe asegurar que estas tengan las mismas variables e información adicional.
 
 ```{r}
+load(url("https://github.com/AlvaroLimber/miadas2_2024/raw/refs/heads/main/_data/ie2324.RData"))
+imp2324<-i23 %>% bind_rows(i24)
+exp2324<-e23 %>% bind_rows(e24)
+#rbind() R
+t1<-eh22p %>% group_by(depto) %>% summarise(edad=mean(edad))
 
+t2<-eh22v %>% group_by(depto) %>% summarise(totper=mean(totper))
+
+t1 %>% inner_join(t2)
+t1 %>% left_join(t2)
+t1 %>% right_join(t2)
+t1 %>% full_join(t2)
 ```
 
 # Ejercicios resueltos
