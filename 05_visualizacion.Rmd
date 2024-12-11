@@ -1,0 +1,68 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Visualización de datos (introducción)
+
+> Los usuarios pueden escanear, reconocer, comprender y recordar representaciones visualmente estructuradas más rápidamente de lo que pueden procesar representaciones no estructuradas
+
+> La ciencia de la visualización se basa en múltiples campos, como la psicología perceptiva, las estadísticas y el diseño gráfico para presentar información
+
+> La efectividad de una visualización depende tanto de las necesidades de análisis como de los objetivos de diseño.
+
+> El diseño, el desarrollo y la evaluación de una visualización se guían por la comprensión de los antecedentes y las metas del público objetivo.
+
+El desarrollo de una visualización efectiva es un proceso iterativo que generalmente incluye los siguientes pasos:
+
+  * Especificar las necesidades del usuario, tareas, requisitos de accesibilidad y criterios para el éxito.
+  * Preparar datos (limpiar, transformar).
+  * Diseñar representaciones visuales.
+  * Interacción de diseño.
+  * Planifique el intercambio de ideas, procedencia.
+  * Prototipo / evaluación, incluidas las pruebas de usabilidad.
+  * Implementar (supervisar el uso, proporcionar soporte al usuario, gestionar el proceso de revisión).
+
+## Gramática de figuras
+
+Al hacer un gráfico se debe definir 3 aspectos:
+
+  1. **Información (dataset):** El insumo base de la figura (métrica). 
+  2. **Estética (componentes):** x, y, color, textura, tamaño, texto
+  3. **Geometría:** (forma) puntos, lineas, barras, histogramas, etc. 
+
+```{r}
+rm(list = ls())
+library(ggplot2) # gramática de gráficos
+library(haven)
+library(dplyr)
+library(labelled)
+library(plotly) # genera gráficos "interactivos" (html)
+library(ExPanDaR) # Exploración completa del dataset (visual) dashboard
+load("_data/eh22.RData")
+load("_data/ie2324.RData")
+####exploración
+ExPanD(exp24)
+####figuras de origen
+#boxplot()
+#barplot()
+#pie()
+#hist()
+#plot()
+#points()
+#arrows()
+####GGPLOT2
+ggplot(exp24, aes(log(VALOR))) + geom_boxplot()
+ggplot(exp24, aes(log(VALOR))) + geom_histogram()
+ggplot(exp24, aes(log(VALOR))) + geom_density()
+
+ggplot(exp24, aes(log(VALOR), colour = factor(MES))) + geom_density()
+
+g1<-ggplot(exp24, aes(VALOR, KILBRU, colour = factor(MES)))+geom_point()
+pdf("g1.pdf")
+g1
+dev.off()
+
+#### Plotly
+ggplotly(g1)
+```
