@@ -7,23 +7,23 @@ editor_options:
 
 > Los usuarios pueden escanear, reconocer, comprender y recordar representaciones visualmente estructuradas más rápidamente de lo que pueden procesar representaciones no estructuradas
 
-> La ciencia de la visualización se basa en múltiples campos, como la psicología perceptiva, las estadísticas y el diseño gráfico para presentar información
+> La ciencia de la visualización se basa en múltiples campos, como la **psicología perceptiva**, las **estadísticas** y el **diseño gráfico** para presentar información
 
-> La efectividad de una visualización depende tanto de las necesidades de análisis como de los objetivos de diseño.
+> La efectividad de una visualización depende tanto de las necesidades de **análisis** como de los objetivos de diseño.
 
-> El diseño, el desarrollo y la evaluación de una visualización se guían por la comprensión de los antecedentes y las metas del público objetivo.
+> El diseño, el desarrollo y la evaluación de una visualización se guían por la comprensión de los *antecedentes* y las metas del **público objetivo**.
 
 El desarrollo de una visualización efectiva es un proceso iterativo que generalmente incluye los siguientes pasos:
 
   * Especificar las necesidades del usuario, tareas, requisitos de accesibilidad y criterios para el éxito.
   * Preparar datos (limpiar, transformar).
-  * Diseñar representaciones visuales.
+  * *Diseñar representaciones visuales*.
   * Interacción de diseño.
   * Planifique el intercambio de ideas, procedencia.
   * Prototipo / evaluación, incluidas las pruebas de usabilidad.
   * Implementar (supervisar el uso, proporcionar soporte al usuario, gestionar el proceso de revisión).
 
-## Gramática de figuras
+## Gramática de figuras/gráficos
 
 Al hacer un gráfico se debe definir 3 aspectos:
 
@@ -39,10 +39,11 @@ library(dplyr)
 library(labelled)
 library(plotly) # genera gráficos "interactivos" (html)
 library(ExPanDaR) # Exploración completa del dataset (visual) dashboard
+load("_data/e20.RData")
 load("_data/eh22.RData")
 load("_data/ie2324.RData")
 ####exploración
-ExPanD(exp24)
+ExPanD(e20)
 ####figuras de origen
 #boxplot()
 #barplot()
@@ -52,17 +53,61 @@ ExPanD(exp24)
 #points()
 #arrows()
 ####GGPLOT2
-ggplot(exp24, aes(log(VALOR))) + geom_boxplot()
-ggplot(exp24, aes(log(VALOR))) + geom_histogram()
-ggplot(exp24, aes(log(VALOR))) + geom_density()
+ggplot(e20, aes(VALIDOS)) + geom_boxplot()
+ggplot(e20, aes(VALIDOS)) + geom_histogram()
+ggplot(e20, aes(VALIDOS)) + geom_density()
+#votos validos por departamento
+t1<-e20 %>% group_by(depto=Nombre.DEPARTAMENTO) %>% summarise(val=sum(VALIDOS))
+ggplot(t1, aes(depto, val))+geom_bar(stat = "identity", col="black", fill="red", alpha=0.2)
 
-ggplot(exp24, aes(log(VALOR), colour = factor(MES))) + geom_density()
+ggplot(e20 %>% rename(cc=CC, depto=Nombre.DEPARTAMENTO ), aes(depto, cc, col=depto))+geom_boxplot()+xlab("Departamento")+ylab("Votos CC")
 
-g1<-ggplot(exp24, aes(VALOR, KILBRU, colour = factor(MES)))+geom_point()
+t2<-e20 %>% group_by(imun=Codigo.MUNICIPIO, dmun=Nombre.MUNICIPIO, depto=Nombre.DEPARTAMENTO) %>% summarise_at(vars(MAS.IPSP, CC, VALIDOS), sum) %>% 
+  mutate(mas=(MAS.IPSP/VALIDOS)*100, cc=(CC/VALIDOS)*100)
+
+ggplot(t2, aes(mas, cc))+geom_point()
+
+ggplot(t2, aes(mas, cc, colour = depto, size = VALIDOS, label=dmun))+geom_point()+geom_label()
+
+pdf("_fig/e20m.pdf", width = 11, height = 11)
+ggplot(t2, aes(mas, cc, colour = depto, size = VALIDOS, label=dmun))+geom_point()+geom_label()
+dev.off()
+
+#geom_smoth
+
+ggplot(e24, aes(log(VALOR))) + geom_boxplot()
+ggplot(e24, aes(log(VALOR))) + geom_histogram()
+ggplot(e24, aes(log(VALOR))) + geom_density()
+
+ggplot(e24, aes(log(VALOR), colour = factor(MES))) + geom_density()
+
+g1<-ggplot(e24, aes(VALOR, KILBRU, colour = factor(MES)))+geom_point()
 pdf("g1.pdf")
 g1
 dev.off()
 
 #### Plotly
+ggplot(t2, aes(mas, cc))+geom_point()
+g1<-ggplot(t2, aes(mas, cc))+geom_point()
+
 ggplotly(g1)
+
+
+
+# Upload library
+library(circlize)
+circos.par("track.height" = 0.4)
+
+# Create data
+data = data.frame(
+    factor = sample(letters[1:8], 1000, replace = TRUE),
+    x = rnorm(1000),
+    y = runif(1000)
+    )
+
+# Step1: Initialise the chart giving factor and x-axis.
+circos.initialize( factors=data$factor, x=data$x )
+
+circos.trackHist(data$factor, data$x, bg.col = "white", col = "#69b3a2")
+
 ```

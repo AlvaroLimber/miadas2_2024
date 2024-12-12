@@ -653,6 +653,36 @@ t3 %>% mutate(aux=vexp-vimp) %>% arrange(-aux) %>% head(1)
 imp24 %>% count(NANDINA, DESNAN) %>% filter(NANDINA==2711210000) %>% select(DESNAN)
 ```
 
+## Uso de encuestas por muestreo
+
+Este tipo de dataset son el resultado de una recolección representiva de la población. Por lo tanto se puede realizar el proceso de **inferencia**.
+
+$$\hat{t}_x=\sum_s \frac{x_i}{\pi_i}=\sum_i x_i * w_i$$
+
+```{r}
+rm(list = ls())
+library(dplyr)
+library(haven)
+library(labelled)
+library(srvyr)#encuestas por muestreo
+load(url("https://github.com/AlvaroLimber/miadas2_2024/raw/refs/heads/main/_data/eh22.RData"))
+#Muestra 
+eh22p %>% count(s01a_02)
+# Inferencia
+eh22p %>% select(factor, upm, estrato)
+eh22p %>% count(estrato)
+boxplot(eh22p$factor)
+summary(eh22p$factor)
+sum(eh22p$factor)# Población de refencia (U)
+
+eh22p_sd<-eh22p %>% as_survey_design(ids = upm, strata = estrato, weights = factor)#inferencia
+
+eh22p_sd %>% survey_count(s01a_02)
+eh22p_sd %>% survey_count(s01a_02, vartype = "cv")
+
+eh22p_sd %>% filter(s01a_03>=18) %>% group_by(depto, area) %>%  summarise(x=survey_mean(aestudio, vartype = "cv")) %>% arrange(x_cv)
+```
+
 # Ejercicio propuestos
 
 1. (EH22) Obtenga el promedio de años de educación de personas mayores a 18 años, del área rural del departamento de Beni.
